@@ -2,15 +2,14 @@ package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.CompanyEmailRequest;
+import com.igloo_club.nungil_v3.dto.CompanyListResponse;
 import com.igloo_club.nungil_v3.dto.CompanyVerificationRequest;
 import com.igloo_club.nungil_v3.service.CompanyService;
 import com.igloo_club.nungil_v3.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -47,6 +46,17 @@ public class CompanyController {
         companyService.verifyAuthCode(request, member);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * 주어진 이메일을 사용하는 회사명 목록을 반환하는 메서드이다.
+     * @param email 회사 이메일
+     * @return 회사명 목록
+     */
+    @GetMapping("/api/company")
+    public ResponseEntity<CompanyListResponse> getCompanyList(@RequestParam String email) {
+        CompanyListResponse companyList = companyService.getCompanyList(email);
+        return ResponseEntity.ok(companyList);
     }
 
     private Member getMember(Principal principal) {

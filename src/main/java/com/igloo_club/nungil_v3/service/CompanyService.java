@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.Company;
 import com.igloo_club.nungil_v3.domain.Member;
+import com.igloo_club.nungil_v3.dto.CompanyListResponse;
 import com.igloo_club.nungil_v3.dto.CompanyVerificationRequest;
 import com.igloo_club.nungil_v3.exception.CompanyErrorResult;
 import com.igloo_club.nungil_v3.exception.GeneralException;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,6 +80,22 @@ public class CompanyService {
 
         // 3. 인증번호가 올바른지 검증한다.
         checkAuthCode(request.getCode(), email);
+    }
+
+    public CompanyListResponse getCompanyList(String email) {
+
+        // 1. 사용이 불가능한 회사 도메인이면 탐색을 막는다.
+        String domain = extractDomain(email);
+        validateDomain(domain);
+
+        // 2. 최대 3개의 회사명을 오름차순으로 정렬하여 조회
+        List<Company> companyList = companyRepository.findTop3ByEmailOrderByCompanyNameAsc(domain);
+        List<String> companyNameList = companyList.stream()
+                .map(Company::getCompanyName)
+                .distinct()
+                .collect(Collectors.toList());
+
+        return CompanyListResponse.create(companyNameList, domain);
     }
 
     private void checkAuthCode(String code, String email) throws GeneralException {
