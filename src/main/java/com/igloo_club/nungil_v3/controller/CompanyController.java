@@ -2,9 +2,11 @@ package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.CompanyEmailRequest;
+import com.igloo_club.nungil_v3.dto.CompanyVerificationRequest;
 import com.igloo_club.nungil_v3.service.CompanyService;
 import com.igloo_club.nungil_v3.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +33,20 @@ public class CompanyController {
         companyService.sendAuthEmail(request.getEmail(), member);
 
         return ResponseEntity.ok(null);
+    }
+
+    /**
+     * 인증번호를 검증하고, 성공 시 회사 정보를 저장하는 메서드이다.
+     * @param request 인증번호 검증 요청 DTO
+     * @param principal 회원 정보가 담긴 Principal 객체
+     */
+    @PostMapping("/api/company/verification")
+    public ResponseEntity<?> verifyAuthCode(@RequestBody CompanyVerificationRequest request, Principal principal) {
+        Member member = getMember(principal);
+
+        companyService.verifyAuthCode(request, member);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private Member getMember(Principal principal) {

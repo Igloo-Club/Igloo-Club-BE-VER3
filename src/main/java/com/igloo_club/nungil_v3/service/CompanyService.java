@@ -1,9 +1,13 @@
 package com.igloo_club.nungil_v3.service;
 
+import com.igloo_club.nungil_v3.domain.Company;
 import com.igloo_club.nungil_v3.domain.Member;
+import com.igloo_club.nungil_v3.dto.CompanyVerificationRequest;
 import com.igloo_club.nungil_v3.exception.CompanyErrorResult;
 import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.GlobalErrorResult;
 import com.igloo_club.nungil_v3.exception.MemberErrorResult;
+import com.igloo_club.nungil_v3.repository.CompanyRepository;
 import com.igloo_club.nungil_v3.repository.MemberRepository;
 import com.igloo_club.nungil_v3.util.EmailMessage;
 import com.igloo_club.nungil_v3.util.EmailSender;
@@ -30,6 +34,8 @@ public class CompanyService {
 
     private final MemberRepository memberRepository;
 
+    private final CompanyRepository companyRepository;
+
     public void sendAuthEmail(String email, Member member) {
 
         // 1. 사용이 불가능한 도메인인지 확인한다.
@@ -52,6 +58,39 @@ public class CompanyService {
         String filename = "company-authentication.html";
 
         emailSender.send(EmailMessage.create(email, subject, filename).addContext("code", code));
+    }
+
+    /**
+     * 인증번호를 검증하고, 성공한 경우 회원 정보의 회사 정보를 수정하는 메서드이다.
+     * @param request 인증번호 검증 요청 DTO
+     * @param member 검증을 요청한 회원 엔티티
+     */
+    @Transactional
+    public void verifyAuthCode(CompanyVerificationRequest request, Member member) {
+        String email = request.getEmail();
+        String companyDomain = extractDomain(email);
+
+        // 1. 사용이 불가능한 회사 도메인인지 확인한다.
+        validateDomain(companyDomain);
+
+        // 2. 이미 가입된 이메일인지 확인한다.
+        checkDuplicatedEmail(email, member);
+
+        // 3. 인증번호가 올바른지 검증한다.
+        checkAuthCode(request.getCode(), email);
+    }
+
+    private void checkAuthCode(String code, String email) throws GeneralException {
+        // 1. 요청된 회사 이메일을 키로 갖는 인증번호가 없거나 만료된 경우
+        String foundCode = redisUtil.get(email);
+        if (foundCode == null) {
+            throw new GeneralException(GlobalErrorResult.REDIS_NOT_FOUND);
+        }
+
+        // 2. 주어진 인증번호가 틀린 경우
+        if (!foundCode.equals(code)) {
+            throw new GeneralException(CompanyErrorResult.WRONG_AUTH_CODE);
+        }
     }
 
     /**

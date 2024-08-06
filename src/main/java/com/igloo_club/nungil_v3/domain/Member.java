@@ -56,5 +56,8 @@ public class Member {
     }
 
 
-
+    public void setCompanyAndEmail(Company company, String email) {
+        this.company = company;
+        this.email = email;
+    }
 }
