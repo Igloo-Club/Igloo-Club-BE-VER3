@@ -64,7 +64,7 @@ public class CompanyService {
     }
 
     /**
-     * 인증번호를 검증하고, 성공한 경우 회원 정보의 회사 정보를 수정하는 메서드이다.
+     * 인증번호를 검증하고, 성공한 경우 회원 정보의 이메일을 수정하는 메서드이다.
      * @param request 인증번호 검증 요청 DTO
      * @param member 검증을 요청한 회원 엔티티
      */
@@ -81,6 +81,9 @@ public class CompanyService {
 
         // 3. 인증번호가 올바른지 검증한다.
         checkAuthCode(request.getCode(), email);
+
+        // 4. 해당 이메일이 인증되었음을 보이기 위해, 이메일 정보를 저장한다.
+        member.updateEmail(email);
     }
 
     public CompanyListResponse getCompanyList(String email) {
@@ -108,14 +111,20 @@ public class CompanyService {
         // 1. 사용이 불가능한 회사 도메인인지 확인한다.
         validateDomain(domain);
 
-        // 2. 이미 가입된 이메일인지 확인한다.
-        checkDuplicatedEmail(email, member);
+        // 2. 이전에 인증된 이메일과 동일한 이메일로 요청을 보냈는지 확인한다.
+        checkSameAuthenticatedEmail(email, member.getEmail());
 
         // 3. 주어진 회사명과 도메인을 가진 Company 엔티티를 조회한다.
         Company company = getCompany(companyName, domain);
 
-        // 4. 회원 정보에 이메일과 회사를 등록한다.
-        member.setCompanyAndEmail(company, email);
+        // 4. 회원 정보에 회사를 등록한다.
+        member.updateCompany(company);
+    }
+
+    private void checkSameAuthenticatedEmail(String requestedEmail, String authenticatedEmail) throws GeneralException {
+        if (!requestedEmail.equals(authenticatedEmail)) {
+            throw new GeneralException(CompanyErrorResult.UNAUTHENTICATED_EMAIL);
+        }
     }
 
     /**
