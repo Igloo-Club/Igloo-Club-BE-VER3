@@ -3,6 +3,7 @@ package com.igloo_club.nungil_v3.controller;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.CompanyEmailRequest;
 import com.igloo_club.nungil_v3.dto.CompanyListResponse;
+import com.igloo_club.nungil_v3.dto.CompanyRegisterRequest;
 import com.igloo_club.nungil_v3.dto.CompanyVerificationRequest;
 import com.igloo_club.nungil_v3.service.CompanyService;
 import com.igloo_club.nungil_v3.service.MemberService;
@@ -57,6 +58,15 @@ public class CompanyController {
     public ResponseEntity<CompanyListResponse> getCompanyList(@RequestParam String email) {
         CompanyListResponse companyList = companyService.getCompanyList(email);
         return ResponseEntity.ok(companyList);
+    }
+
+    @PostMapping("/api/company")
+    public ResponseEntity<?> registerCompany(@RequestBody CompanyRegisterRequest request, Principal principal) {
+        Member member = getMember(principal);
+
+        companyService.registerCompany(request, member);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private Member getMember(Principal principal) {

@@ -3,6 +3,7 @@ package com.igloo_club.nungil_v3.service;
 import com.igloo_club.nungil_v3.domain.Company;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.CompanyListResponse;
+import com.igloo_club.nungil_v3.dto.CompanyRegisterRequest;
 import com.igloo_club.nungil_v3.dto.CompanyVerificationRequest;
 import com.igloo_club.nungil_v3.exception.CompanyErrorResult;
 import com.igloo_club.nungil_v3.exception.GeneralException;
@@ -96,6 +97,43 @@ public class CompanyService {
                 .collect(Collectors.toList());
 
         return CompanyListResponse.create(companyNameList, domain);
+    }
+
+    @Transactional
+    public void registerCompany(CompanyRegisterRequest request, Member member) {
+        String email = request.getEmail();
+        String companyName = request.getCompanyName();
+        String domain = extractDomain(email);
+
+        // 1. 사용이 불가능한 회사 도메인인지 확인한다.
+        validateDomain(domain);
+
+        // 2. 이미 가입된 이메일인지 확인한다.
+        checkDuplicatedEmail(email, member);
+
+        // 3. 주어진 회사명과 도메인을 가진 Company 엔티티를 조회한다.
+        Company company = getCompany(companyName, domain);
+
+        // 4. 회원 정보에 이메일과 회사를 등록한다.
+        member.setCompanyAndEmail(company, email);
+    }
+
+    /**
+     * 주어진 회사명과 도메인을 가진 Company 엔티티가 존재하면 조회하고,
+     * 그렇지 않으면 생성하여 반환하는 메서드이다.
+     *
+     * @param companyName 회사명
+     * @param domain 회사 도메인
+     * @return Company 엔티티
+     */
+    private Company getCompany(String companyName, String domain) {
+        Company company = companyRepository.findByCompanyNameAndEmail(companyName, domain)
+                .orElse(Company.builder()
+                        .companyName(companyName)
+                        .email(domain)
+                        .build());
+        companyRepository.save(company);
+        return company;
     }
 
     private void checkAuthCode(String code, String email) throws GeneralException {
