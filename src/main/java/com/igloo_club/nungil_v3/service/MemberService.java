@@ -1,6 +1,7 @@
 package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.Member;
+import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.MemberErrorResult;
 import com.igloo_club.nungil_v3.repository.MemberRepository;
@@ -18,5 +19,10 @@ public class MemberService {
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(MemberErrorResult.USER_NOT_FOUND));
+    }
+
+    @Transactional
+    public void createRequiredProfile(RequiredProfileCreateRequest request, Member member) {
+        member.updateRequiredProfile(request);
     }
 }

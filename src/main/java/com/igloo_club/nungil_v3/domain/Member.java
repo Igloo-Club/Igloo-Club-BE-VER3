@@ -2,7 +2,7 @@ package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
-import com.igloo_club.nungil_v3.dto.ProfileUpdateRequest;
+import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,11 +48,10 @@ public class Member {
     private LocalDate createdAt = LocalDate.now();
 
     // == 비즈니스 로직 == //
-    public void updateProfile(ProfileUpdateRequest request) {
+    public void updateRequiredProfile(RequiredProfileCreateRequest request) {
         this.nickname = request.getNickname();
         this.sex = request.getSex();
         this.birthdate = request.getBirthdate();
-        this.location = request.getLocation();
     }
 
 

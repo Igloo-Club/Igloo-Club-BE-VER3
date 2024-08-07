@@ -2,7 +2,6 @@ package com.igloo_club.nungil_v3.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfileUpdateRequest {
+public class RequiredProfileCreateRequest {
     @NotBlank
     @Size(max = 8)
     private String nickname;
@@ -26,7 +25,4 @@ public class ProfileUpdateRequest {
     @Past
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate birthdate;
-
-    @NotNull
-    private Location location;
 }
