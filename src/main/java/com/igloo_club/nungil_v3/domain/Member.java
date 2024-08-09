@@ -47,6 +47,10 @@ public class Member {
     @Builder.Default
     private LocalDate createdAt = LocalDate.now();
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
+
     // == 비즈니스 로직 == //
     public void updateRequiredProfile(RequiredProfileCreateRequest request) {
         this.nickname = request.getNickname();
