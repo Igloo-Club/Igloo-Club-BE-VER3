@@ -10,6 +10,8 @@ import com.igloo_club.nungil_v3.service.OauthService;
 import com.igloo_club.nungil_v3.service.TokenService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Positive;
 import java.security.Principal;
 
 @RestController
@@ -32,12 +35,15 @@ public class OauthController {
 
     @PostMapping("/api/auth/kakao")
     @Operation(summary = "카카오 로그인", description = "카카오 인가 코드를 사용하여 로그인하는 API")
-    public ResponseEntity<LoginResponse> kakaoLogin(@RequestBody OauthLoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<LoginResponse> kakaoLogin(
+            @RequestBody
+            OauthLoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
         LoginResponse loginResponse = oauthService.kakaoLogin(loginRequest.getCode(), request, response);
         return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/api/auth/refresh")
+    @Operation(summary = "액세스 토큰 재발급", description = "쿠키에 저장된 리프레시 토큰으로 액세스 토큰을 재발급하는 API")
     public ResponseEntity<LoginResponse> createNewAccessToken(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
         if (refreshToken == null) {
             throw new GeneralException(TokenErrorResult.REFRESH_TOKEN_NOT_FOUND);
