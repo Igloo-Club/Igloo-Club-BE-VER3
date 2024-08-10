@@ -58,6 +58,11 @@ public class Member {
         this.birthdate = request.getBirthdate();
     }
 
+    public void createDetailedProfile(Profile profile) {
+        this.profile = profile;
+    }
 
-
+    public void updateCompany(Company company) {
+        this.company = company;
+    }
 }

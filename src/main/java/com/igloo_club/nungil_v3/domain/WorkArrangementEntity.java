@@ -1,16 +1,14 @@
 package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.WorkArrangement;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "work_arrangement")
 public class WorkArrangementEntity {

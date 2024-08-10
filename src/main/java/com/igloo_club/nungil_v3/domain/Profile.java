@@ -1,12 +1,7 @@
 package com.igloo_club.nungil_v3.domain;
 
-import com.igloo_club.nungil_v3.domain.enums.Mbti;
-import com.igloo_club.nungil_v3.domain.enums.Religion;
-import com.igloo_club.nungil_v3.domain.enums.WorkArrangement;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.igloo_club.nungil_v3.domain.enums.*;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,6 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 @Entity
 public class Profile {
 
@@ -49,17 +45,38 @@ public class Profile {
     private String job;
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<WorkArrangementEntity> workArrangementEntityList = new ArrayList<>();
 
     @Column(columnDefinition = "VARCHAR(255) DEFAULT ''")
     private String intro;
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Hobby> hobbyList = new ArrayList<>();
 
     public List<WorkArrangement> getWorkArrangementList() {
         return workArrangementEntityList.stream()
                 .map(WorkArrangementEntity::getWorkArrangement)
                 .collect(Collectors.toList());
+    }
+
+    public void addWorkArrangement(WorkArrangement workArrangement) {
+        WorkArrangementEntity workArrangementEntity = WorkArrangementEntity.builder()
+                .workArrangement(workArrangement)
+                .profile(this)
+                .build();
+
+        this.workArrangementEntityList.add(workArrangementEntity);
+    }
+
+    public void addHobby(HobbyCategory category, HobbyName name) {
+        Hobby hobby = Hobby.builder()
+                .category(category)
+                .name(name)
+                .profile(this)
+                .build();
+
+        this.hobbyList.add(hobby);
     }
 }

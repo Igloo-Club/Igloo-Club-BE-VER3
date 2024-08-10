@@ -2,10 +2,7 @@ package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.HobbyCategory;
 import com.igloo_club.nungil_v3.domain.enums.HobbyName;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,6 +10,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 @Entity
 public class Hobby {
 

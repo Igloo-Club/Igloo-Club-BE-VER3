@@ -25,4 +25,22 @@ public class Company {
     @Column(columnDefinition = "VARCHAR(20)")
     @Enumerated(value = EnumType.STRING)
     private CompanyScale scale;
+
+    public Company updateOrCreateCompanyWithScale(CompanyScale scale) {
+
+        if (this.scale == null) {
+            this.scale = scale;
+            return this;
+        }
+
+        if (!this.scale.equals(scale)) {
+            return Company.builder()
+                    .companyName(this.companyName)
+                    .email(this.email)
+                    .scale(scale)
+                    .build();
+        }
+
+        return this;
+    }
 }
