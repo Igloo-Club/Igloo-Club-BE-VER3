@@ -136,7 +136,7 @@ public class CompanyService {
      * @return Company 엔티티
      */
     private Company getCompany(String companyName, String domain) {
-        Company company = companyRepository.findByCompanyNameAndEmail(companyName, domain)
+        Company company = companyRepository.findTopByCompanyNameAndEmail(companyName, domain)
                 .orElse(Company.builder()
                         .companyName(companyName)
                         .email(domain)
