@@ -184,15 +184,15 @@ public class CompanyService {
      */
     private void checkDuplicatedEmail(String email, Member requester) {
         Optional<Member> optional = memberRepository.findByEmail(email);
-        // 주어진 email을 사용하는 회원이 존재하지 않으면 종료
+        // 중복된 이메일을 사용하는 회원이 존재하지 않으면 성공
         if (optional.isEmpty()) {
             return;
         }
 
-        // 주어진 email을 사용하는 회원이 자기자신이면 종료
+        // 중복된 이메일을 사용하는 회원이 자기자신인 경우
         Member member = optional.get();
         if (member.getId().equals(requester.getId())) {
-            return;
+            throw new GeneralException(MemberErrorResult.ALREADY_USING);
         }
 
         throw new GeneralException(MemberErrorResult.DUPLICATED_EMAIL);
