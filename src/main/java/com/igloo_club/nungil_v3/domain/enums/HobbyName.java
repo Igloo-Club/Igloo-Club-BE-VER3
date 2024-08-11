@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum HobbyName {
 
+    LOCAL("국내", HobbyCategory.TRIP),
+    ABROAD("해외", HobbyCategory.TRIP),
     SPORTS("스포츠", HobbyCategory.EXERCISE),
     FITNESS("헬스/크로스핏", HobbyCategory.EXERCISE),
     PILATES("필라테스/요가", HobbyCategory.EXERCISE),

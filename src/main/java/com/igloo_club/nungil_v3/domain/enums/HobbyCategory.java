@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum HobbyCategory {
+    TRIP("여행"),
     EXERCISE("운동"),
     READING("독서"),
     MUSIC("음악"),
