@@ -5,10 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
 public class LocationCreateRequest {
 
+    @NotNull
     private final Location location;
 }

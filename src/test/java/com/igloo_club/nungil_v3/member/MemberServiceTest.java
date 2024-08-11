@@ -3,8 +3,10 @@ package com.igloo_club.nungil_v3.member;
 import com.igloo_club.nungil_v3.domain.Company;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.domain.enums.CompanyScale;
+import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
 import com.igloo_club.nungil_v3.dto.DetailedProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
 import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
 import com.igloo_club.nungil_v3.repository.CompanyRepository;
 import com.igloo_club.nungil_v3.repository.MemberRepository;
@@ -132,6 +134,23 @@ public class MemberServiceTest {
         assertThat(member.getCompany().getScale()).isEqualTo(requestScale);
         assertThat(member.getCompany().getScale()).isNotEqualTo(companyScale);
     }
+
+    @Test
+    public void 근무지등록성공() {
+        // given
+        Location location = Location.PANGYO;
+
+        LocationCreateRequest request = new LocationCreateRequest(location);
+        Member member = Member.builder().build();
+
+        // when
+        target.createLocation(request, member);
+
+        // then
+        assertThat(member.getLocation().size()).isEqualTo(1);
+        assertThat(member.getLocation().get(0)).isEqualTo(location);
+    }
+
 
     private static Stream<Arguments> detailedProfileCreate_differentScale() {
         Stream.Builder<Arguments> builder = Stream.builder();
