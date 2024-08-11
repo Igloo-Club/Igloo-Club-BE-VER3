@@ -4,7 +4,9 @@ import com.igloo_club.nungil_v3.domain.Company;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.domain.Profile;
 import com.igloo_club.nungil_v3.domain.enums.CompanyScale;
+import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.dto.DetailedProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
 import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.MemberErrorResult;
@@ -50,5 +52,10 @@ public class MemberService {
 
             companyRepository.save(updatedCompany);
         }
+    }
+
+    @Transactional
+    public void createLocation(LocationCreateRequest request, Member member) {
+        member.addLocation(request.getLocation());
     }
 }

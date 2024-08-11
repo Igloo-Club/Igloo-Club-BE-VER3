@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -26,8 +28,14 @@ public class Member {
 
     private String email;
 
+    @ElementCollection
+    @CollectionTable(name = "location", joinColumns = {
+            @JoinColumn(name = "member_id")
+    })
+    @Column(name = "location_name")
     @Enumerated(value = EnumType.STRING)
-    private Location location;
+    @Builder.Default
+    private List<Location> location = new ArrayList<>();
 
     @Enumerated(value = EnumType.STRING)
     private Sex sex;
@@ -64,5 +72,9 @@ public class Member {
 
     public void updateCompany(Company company) {
         this.company = company;
+    }
+
+    public void addLocation(Location location) {
+        this.location.add(location);
     }
 }

@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.DetailedProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
 import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
 import com.igloo_club.nungil_v3.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,15 @@ public class MemberController {
         Member member = getMember(principal);
 
         memberService.createDetailedProfile(request, member);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/api/member/location")
+    public ResponseEntity<?> createLocation(@RequestBody LocationCreateRequest request, Principal principal) {
+        Member member = getMember(principal);
+
+        memberService.createLocation(request, member);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
