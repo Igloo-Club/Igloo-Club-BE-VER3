@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Company {
+public class Company implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,21 +26,26 @@ public class Company {
     @Enumerated(value = EnumType.STRING)
     private CompanyScale scale;
 
-    public Company updateOrCreateCompanyWithScale(CompanyScale scale) {
+    public void updateScale(CompanyScale scale) {
+        this.scale = scale;
+    }
 
-        if (this.scale == null) {
-            this.scale = scale;
-            return this;
+    public Company cloneWithScale(CompanyScale scale) {
+        try {
+            Company company = this.clone();
+            company.updateScale(scale);
+            return company;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        if (!this.scale.equals(scale)) {
-            return Company.builder()
-                    .companyName(this.companyName)
-                    .email(this.email)
-                    .scale(scale)
-                    .build();
+    @Override
+    protected Company clone() throws CloneNotSupportedException {
+        try {
+            return (Company) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
         }
-
-        return this;
     }
 }

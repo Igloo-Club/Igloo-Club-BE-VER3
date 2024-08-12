@@ -38,20 +38,8 @@ public class MemberService {
     @Transactional
     public void createDetailedProfile(DetailedProfileCreateRequest request, Member member) {
 
-        // 1. 상세 프로필 등록
         Profile profile = request.toProfile();
         member.createDetailedProfile(profile);
-
-
-        // 2. 회사 규모 등록
-        CompanyScale scale = request.getScale();
-        if (scale != null) {
-            Company company = member.getCompany();
-            Company updatedCompany = company.updateOrCreateCompanyWithScale(scale);
-            member.updateCompany(updatedCompany);
-
-            companyRepository.save(updatedCompany);
-        }
     }
 
     @Transactional

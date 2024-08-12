@@ -4,6 +4,7 @@ import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.DetailedProfileCreateRequest;
 import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
 import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
+import com.igloo_club.nungil_v3.service.CompanyService;
 import com.igloo_club.nungil_v3.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,8 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    private final CompanyService companyService;
+
     @PostMapping("/api/member/required")
     public ResponseEntity<?> createRequiredProfile(@RequestBody RequiredProfileCreateRequest request, Principal principal) {
         Member member = getMember(principal);
@@ -33,7 +36,10 @@ public class MemberController {
     public ResponseEntity<?> createDetailedProfile(@RequestBody DetailedProfileCreateRequest request, Principal principal) {
         Member member = getMember(principal);
 
+        // 1. 상세 프로필 등록
         memberService.createDetailedProfile(request, member);
+        // 2. 회사 규모 등록
+        companyService.registerCompanyScale(request.getScale(), member.getCompany(), member);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
