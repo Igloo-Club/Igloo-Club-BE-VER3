@@ -1,10 +1,7 @@
 package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.CompanyScale;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -18,8 +15,10 @@ public class Company implements Cloneable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NonNull
     private String companyName;
 
+    @NonNull
     private String email;
 
     @Column(columnDefinition = "VARCHAR(20)")

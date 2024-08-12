@@ -74,6 +74,9 @@ public class Member {
         this.company = company;
     }
 
+    public void updateEmail(String email) {
+        this.email = email;
+    }
     public void addLocation(Location location) {
         this.location.add(location);
     }
