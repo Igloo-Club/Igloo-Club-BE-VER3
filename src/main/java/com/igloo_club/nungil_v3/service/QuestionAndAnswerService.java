@@ -126,7 +126,7 @@ public class QuestionAndAnswerService {
         // 다음 페이지 존재 여부 확인
         boolean hasNext = questionAndAnswerPage.hasNext();
 
-        // 변환된 DTO 리스트와 함께 새로운 Page 객체를 생성하여 반환
+        // 변환된 DTO 리스트와 함께 새로운 Slice 객체를 생성하여 반환
         return new SliceImpl<>(questionAndAnswerResponse, pageRequest, hasNext);
     }
 
