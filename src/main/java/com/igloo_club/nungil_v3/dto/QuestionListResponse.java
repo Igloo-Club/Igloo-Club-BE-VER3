@@ -13,11 +13,14 @@ public class QuestionListResponse {
 
     private Question question;
 
+    private String questionTitle;
+
     private Boolean answered;
 
     public static QuestionListResponse create(Question question, List<Question> answeredQuestion){
         QuestionListResponse response = new QuestionListResponse();
         response.question = question;
+        response.questionTitle = question.getTitle();
         response.answered = answeredQuestion.contains(question);
 
         return response;
