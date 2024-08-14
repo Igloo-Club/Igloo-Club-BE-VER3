@@ -92,9 +92,9 @@ public class QuestionAndAnswerService {
      *
      * @return QuestionAndAnswerResponse 객체
      */
-    public QuestionAndAnswerResponse getQuestionAndAnswerResponseByMemberAndQuestion(Member member, Question question){
-        QuestionAndAnswer qa = questionAndAnswerRepository.findQuestionAndAnswerByMemberAndQuestion(member, question)
-                .orElseThrow(()->new GeneralException(QuestionAndAnswerErrorResult.WRONG_QUESTION));
+    public QuestionAndAnswerResponse getQuestionAndAnswerResponseByMemberAndQuestion(Long qaId){
+        QuestionAndAnswer qa = questionAndAnswerRepository.findQuestionAndAnswerById(qaId)
+                .orElseThrow(()-> new GeneralException(QuestionAndAnswerErrorResult.WRONG_ID));
 
         return QuestionAndAnswerResponse.create(qa);
     }

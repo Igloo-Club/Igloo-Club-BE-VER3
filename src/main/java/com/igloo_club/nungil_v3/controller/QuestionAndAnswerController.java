@@ -48,14 +48,11 @@ public class QuestionAndAnswerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{question}")
+    @GetMapping("/{qaId}")
     public ResponseEntity<?> getQuestionAndAnswer(
-            @PathVariable Question question,
-            Principal principal) {
+            @PathVariable Long qaId) {
 
-        Member member = getMember(principal);
-
-        QuestionAndAnswerResponse response = questionAndAnswerService.getQuestionAndAnswerResponseByMemberAndQuestion(member, question);
+        QuestionAndAnswerResponse response = questionAndAnswerService.getQuestionAndAnswerResponseByMemberAndQuestion(qaId);
 
         return ResponseEntity.ok(response);
     }
