@@ -1,7 +1,6 @@
 package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
-import com.igloo_club.nungil_v3.domain.enums.Question;
 import com.igloo_club.nungil_v3.domain.enums.QuestionCategory;
 import com.igloo_club.nungil_v3.dto.QuestionAndAnswerCreateRequest;
 import com.igloo_club.nungil_v3.dto.QuestionAndAnswerResponse;
