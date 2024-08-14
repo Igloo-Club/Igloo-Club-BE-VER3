@@ -56,5 +56,11 @@ public class Member {
     }
 
 
+    public void updateCompany(Company company) {
+        this.company = company;
+    }
 
+    public void updateEmail(String email) {
+        this.email = email;
+    }
 }
