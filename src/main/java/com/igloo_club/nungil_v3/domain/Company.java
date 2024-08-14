@@ -1,22 +1,18 @@
 package com.igloo_club.nungil_v3.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.igloo_club.nungil_v3.domain.enums.CompanyScale;
+import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.GlobalErrorResult;
+import lombok.*;
 
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Company {
+public class Company implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,4 +22,31 @@ public class Company {
 
     @NonNull
     private String email;
+
+    @Column(columnDefinition = "VARCHAR(20)")
+    @Enumerated(value = EnumType.STRING)
+    private CompanyScale scale;
+
+    public void updateScale(CompanyScale scale) {
+        this.scale = scale;
+    }
+
+    public Company cloneWithScale(CompanyScale scale) {
+        try {
+            Company company = this.clone();
+            company.updateScale(scale);
+            return company;
+        } catch (CloneNotSupportedException e) {
+            throw new GeneralException(GlobalErrorResult.UNKNOWN_EXCEPTION, e);
+        }
+    }
+
+    @Override
+    protected Company clone() throws CloneNotSupportedException {
+        try {
+            return (Company) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

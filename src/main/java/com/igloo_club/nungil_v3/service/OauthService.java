@@ -93,7 +93,7 @@ public class OauthService {
         // 5. JWT 액세스 토큰 발급
         String accessToken = tokenProvider.generateToken(member, ACCESS_TOKEN_DURATION);
 
-        return new LoginResponse(accessToken, nextProgress.getTitle(), RegisterProgress.REGISTERED.equals(nextProgress));
+        return new LoginResponse(accessToken, nextProgress, RegisterProgress.REGISTERED.equals(nextProgress));
     }
 
     /**
@@ -103,28 +103,28 @@ public class OauthService {
      */
     public RegisterProgress getNextProgress(Member member) {
 
-        // 닉네임 존재하면, 가입 완료
-        if (member.getNickname() != null) {
+        // 상세 프로필 존재하면, 가입 완료
+        if (member.getProfile() != null) {
             return RegisterProgress.REGISTERED;
         }
 
-        // 성별 생년월일이 존재하면, 닉네임 입력부터
-        if (member.getBirthdate() != null) {
-            return RegisterProgress.NICKNAME_INPUT;
+        // 닉네임이 존재하면, 상세 프로필 등록부터
+        if (member.getNickname() != null) {
+            return RegisterProgress.ADDITIONAL_PROFILE;
         }
 
-        // 회사 이메일 인증 후이면, 성별 생년월일 입력부터
+        // 회사명 입력 후이면, 필수 프로필 등록부터
         if (member.getCompany() != null) {
-            return RegisterProgress.GENDER_BIRTHDATE_INPUT;
+            return RegisterProgress.ESSENTIAL_PROFILE;
         }
 
-        // 회사 이메일 입력 후이면, 회사 이메일 입력부터
+        // 회사 이메일 입력 후이면, 회사명 입력부터
         if (member.getEmail() != null) {
-            return RegisterProgress.COMPANY_EMAIL_INPUT;
+            return RegisterProgress.COMPANY_NAME;
         }
 
         // 회사 이메일 입력 전이면, 회사 이메일 입력부터
-        return RegisterProgress.COMPANY_EMAIL_INPUT;
+        return RegisterProgress.COMPANY_EMAIL;
     }
 
     /**
