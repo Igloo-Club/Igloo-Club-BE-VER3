@@ -35,7 +35,7 @@ public class QuestionAndAnswerService {
     @Transactional
     public void createQuestionAndAnswer(QuestionAndAnswerCreateRequest request, Member member){
         // 신규 질의 응답 객체 생성
-        QuestionAndAnswer qa = QuestionAndAnswer.create(request, member);
+        QuestionAndAnswer qa = QuestionAndAnswerCreateRequest.create(request, member);
         Long order = request.getExposureOrder();
 
         // DB를 조회해 기존 질의응답 객체 존재할 시 예외 처리
@@ -66,7 +66,7 @@ public class QuestionAndAnswerService {
         // 중복 있을 시 기존 질의 응답 노출 순서 null로 변경
         handleExposureOrderConflict(member, request.getExposureOrder());
 
-        qa.update(request);
+        qa.update(request.getAnswer(), request.getExposureOrder());
     }
 
     /**

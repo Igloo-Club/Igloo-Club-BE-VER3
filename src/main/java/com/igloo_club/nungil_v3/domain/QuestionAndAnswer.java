@@ -2,8 +2,6 @@ package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.Question;
 import com.igloo_club.nungil_v3.domain.enums.QuestionCategory;
-import com.igloo_club.nungil_v3.dto.QuestionAndAnswerCreateRequest;
-import com.igloo_club.nungil_v3.dto.QuestionAndAnswerUpdateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,24 +38,14 @@ public class QuestionAndAnswer {
     @Builder.Default
     private Long exposureOrder = null;
 
-    // == 정적 생성 메서드 == //
-    public static QuestionAndAnswer create(QuestionAndAnswerCreateRequest request, Member member){
-        return QuestionAndAnswer.builder()
-                .member(member)
-                .question(request.getQuestion())
-                .questionCategory(request.getQuestion().getCategory())
-                .answer(request.getAnswer())
-                .exposureOrder(request.getExposureOrder())
-                .build();
-    }
 
     // == 비즈니스 메서드 == //
     public void updateOrderToNull(){
         this.exposureOrder = null;
     }
 
-    public void update(QuestionAndAnswerUpdateRequest request){
-        this.answer = request.getAnswer();
-        this.exposureOrder = request.getExposureOrder();
+    public void update(String answer, Long exposureOrder){
+        this.answer = answer;
+        this.exposureOrder = exposureOrder;
     }
 }
