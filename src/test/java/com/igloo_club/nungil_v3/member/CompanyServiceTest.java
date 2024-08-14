@@ -34,21 +34,26 @@ public class CompanyServiceTest {
     @Test
     public void 회사규모등록성공_회사규모파라미터가NULL() {
         // given
-        Company company = Company.builder().scale(CompanyScale.LARGE).build();
+        CompanyScale scale = CompanyScale.LARGE;
+        Company company = getCompanyWithScale(scale);
         Member member = Member.builder().company(company).build();
 
         // when
         target.registerCompanyScale(null, company, member);
 
         // then
-        assertThat(member.getCompany().getScale()).isEqualTo(CompanyScale.LARGE);
+        assertThat(member.getCompany().getScale()).isEqualTo(scale);
+    }
+
+    private Company getCompanyWithScale(CompanyScale scale) {
+        return Company.builder().companyName("회사명").email("email.com").scale(scale).build();
     }
 
     @ParameterizedTest
     @MethodSource("detailedProfileCreate_sameScale")
     public void 회사규모등록성공_회사규모파라미터가동일(CompanyScale requestScale, CompanyScale companyScale) {
         // given
-        Company company = Company.builder().scale(companyScale).build();
+        Company company = getCompanyWithScale(companyScale);
         Member member = Member.builder().company(company).build();
 
         // when
@@ -71,11 +76,11 @@ public class CompanyServiceTest {
     @MethodSource("detailedProfileCreate_differentScale")
     public void 회사규모등록성공_회사규모파라미터가상이(CompanyScale requestScale, CompanyScale companyScale) {
         // given
-        doReturn(Optional.of(Company.builder().scale(requestScale).build())).when(companyRepository)
+        doReturn(Optional.of(getCompanyWithScale(requestScale))).when(companyRepository)
                 .findByCompanyNameAndEmailAndScale(anyString(), anyString(), eq(requestScale));
 
 
-        Company company = Company.builder().companyName("회사명").email("email.com").scale(companyScale).build();
+        Company company = getCompanyWithScale(companyScale);
         Member member = Member.builder().company(company).build();
 
         // when
