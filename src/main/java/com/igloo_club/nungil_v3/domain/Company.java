@@ -1,6 +1,10 @@
 package com.igloo_club.nungil_v3.domain;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

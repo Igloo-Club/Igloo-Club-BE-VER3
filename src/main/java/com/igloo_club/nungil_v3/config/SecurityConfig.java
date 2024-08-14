@@ -5,11 +5,8 @@ import com.igloo_club.nungil_v3.config.jwt.TokenProvider;
 import com.igloo_club.nungil_v3.config.jwt.JwtAuthenticationEntryPoint;
 import com.igloo_club.nungil_v3.config.jwt.TokenAuthenticationFilter;
 import com.igloo_club.nungil_v3.config.jwt.JwtAccessDeniedHandler;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -62,6 +59,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/stomp", "/stomp/**").permitAll()
+                .antMatchers("/swagger-ui/index.html").permitAll()
                 .anyRequest().authenticated()
                 .and()
 
@@ -112,4 +110,20 @@ public class SecurityConfig {
 //
 //        private final List<String> allowedOrigins;
 //    }
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers(
+                "/swagger-ui/index.html",
+                "/swagger-ui/swagger-ui-standalone-preset.js",
+                "/swagger-ui/swagger-initializer.js",
+                "/swagger-ui/swagger-ui-bundle.js",
+                "/swagger-ui/swagger-ui.css",
+                "/swagger-ui/index.css",
+                "/swagger-ui/favicon-32x32.png",
+                "/swagger-ui/favicon-16x16.png",
+                "/api-docs/swagger-config",
+                "/api-docs/json/swagger-config",
+                "/api-docs/json",
+                "/api-docs/json/v1");
+    }
 }
