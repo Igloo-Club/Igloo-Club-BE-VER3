@@ -2,7 +2,6 @@ package com.igloo_club.nungil_v3.dto;
 
 import com.igloo_club.nungil_v3.domain.Profile;
 import com.igloo_club.nungil_v3.domain.enums.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(force = true)
 @RequiredArgsConstructor
-public class DetailedProfileCreateRequest {
+public class AdditionalProfileCreateRequest {
     private final Integer height;
 
     private final Religion religion;

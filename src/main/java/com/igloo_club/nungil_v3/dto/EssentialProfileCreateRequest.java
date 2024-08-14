@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequiredProfileCreateRequest {
+public class EssentialProfileCreateRequest {
     @NotBlank
     @Size(max = 8)
     private String nickname;

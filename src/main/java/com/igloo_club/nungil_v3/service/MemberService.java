@@ -1,13 +1,10 @@
 package com.igloo_club.nungil_v3.service;
 
-import com.igloo_club.nungil_v3.domain.Company;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.domain.Profile;
-import com.igloo_club.nungil_v3.domain.enums.CompanyScale;
-import com.igloo_club.nungil_v3.domain.enums.Location;
-import com.igloo_club.nungil_v3.dto.DetailedProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.AdditionalProfileCreateRequest;
 import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
-import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.MemberErrorResult;
 import com.igloo_club.nungil_v3.repository.CompanyRepository;
@@ -31,15 +28,15 @@ public class MemberService {
     }
 
     @Transactional
-    public void createRequiredProfile(RequiredProfileCreateRequest request, Member member) {
-        member.updateRequiredProfile(request);
+    public void createEssentialProfile(EssentialProfileCreateRequest request, Member member) {
+        member.createEssentialProfile(request);
     }
 
     @Transactional
-    public void createDetailedProfile(DetailedProfileCreateRequest request, Member member) {
+    public void createAdditionalProfile(AdditionalProfileCreateRequest request, Member member) {
 
         Profile profile = request.toProfile();
-        member.createDetailedProfile(profile);
+        member.createAdditionalProfile(profile);
     }
 
     @Transactional

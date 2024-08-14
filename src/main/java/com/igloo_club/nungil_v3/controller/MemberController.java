@@ -1,9 +1,9 @@
 package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
-import com.igloo_club.nungil_v3.dto.DetailedProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.AdditionalProfileCreateRequest;
 import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
-import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
 import com.igloo_club.nungil_v3.service.CompanyService;
 import com.igloo_club.nungil_v3.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -23,21 +23,21 @@ public class MemberController {
 
     private final CompanyService companyService;
 
-    @PostMapping("/api/member/required")
-    public ResponseEntity<?> createRequiredProfile(@RequestBody RequiredProfileCreateRequest request, Principal principal) {
+    @PostMapping("/api/member/essential")
+    public ResponseEntity<?> createEssentialProfile(@RequestBody EssentialProfileCreateRequest request, Principal principal) {
         Member member = getMember(principal);
 
-        memberService.createRequiredProfile(request, member);
+        memberService.createEssentialProfile(request, member);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/api/member/detailed")
-    public ResponseEntity<?> createDetailedProfile(@RequestBody DetailedProfileCreateRequest request, Principal principal) {
+    @PostMapping("/api/member/additional")
+    public ResponseEntity<?> createAdditionalProfile(@RequestBody AdditionalProfileCreateRequest request, Principal principal) {
         Member member = getMember(principal);
 
         // 1. 상세 프로필 등록
-        memberService.createDetailedProfile(request, member);
+        memberService.createAdditionalProfile(request, member);
         // 2. 회사 규모 등록
         companyService.registerCompanyScale(request.getScale(), member.getCompany(), member);
 

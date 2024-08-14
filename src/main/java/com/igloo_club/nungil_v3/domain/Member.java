@@ -2,7 +2,7 @@ package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
-import com.igloo_club.nungil_v3.dto.RequiredProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,13 +60,13 @@ public class Member {
     private Profile profile;
 
     // == 비즈니스 로직 == //
-    public void updateRequiredProfile(RequiredProfileCreateRequest request) {
+    public void createEssentialProfile(EssentialProfileCreateRequest request) {
         this.nickname = request.getNickname();
         this.sex = request.getSex();
         this.birthdate = request.getBirthdate();
     }
 
-    public void createDetailedProfile(Profile profile) {
+    public void createAdditionalProfile(Profile profile) {
         this.profile = profile;
     }
 
