@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QuestionAndAnswerResponse {
-    private Long QaId;
+    private Long qaId;
 
     private Question question;
 
@@ -19,7 +19,7 @@ public class QuestionAndAnswerResponse {
 
     public static QuestionAndAnswerResponse create(QuestionAndAnswer qa){
         QuestionAndAnswerResponse response = new QuestionAndAnswerResponse();
-        response.QaId = qa.getId();
+        response.qaId = qa.getId();
         response.question = qa.getQuestion();
         response.answer = qa.getAnswer();
         response.exposureOrder = qa.getExposureOrder();
