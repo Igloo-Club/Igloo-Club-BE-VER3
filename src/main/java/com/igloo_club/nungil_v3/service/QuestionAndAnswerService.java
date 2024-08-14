@@ -28,7 +28,7 @@ public class QuestionAndAnswerService {
     private final QuestionAndAnswerRepository questionAndAnswerRepository;
 
     /**
-     * 질의응답을 생성하는 메소드입니다
+     * 신규 질의응답을 생성하는 메소드입니다
      * @param request 질의응답 생성 요청 DTO
      * @param member 질의응답 생성하는 회원
      */
@@ -37,6 +37,11 @@ public class QuestionAndAnswerService {
         // 신규 질의 응답 객체 생성
         QuestionAndAnswer qa = QuestionAndAnswer.create(request, member);
         Long order = request.getExposureOrder();
+
+        // DB를 조회해 기존 질의응답 객체 존재할 시 예외 처리
+        if(questionAndAnswerRepository.findQuestionAndAnswerByMemberAndQuestion(member, request.getQuestion()).isPresent()){
+            throw  new GeneralException(QuestionAndAnswerErrorResult.ANSWERED_QUESTION);
+        }
 
         // 신규 질의 응답과 노출 순서 중복 여부 확인
         // 중복 있을 시 기존 질의 응답 노출 순서 null로 변경
