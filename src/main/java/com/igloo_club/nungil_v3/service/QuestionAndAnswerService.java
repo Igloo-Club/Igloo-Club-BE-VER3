@@ -148,22 +148,28 @@ public class QuestionAndAnswerService {
                 .map(QuestionAndAnswer::getQuestion)
                 .collect(Collectors.toList());
 
-        // QuestionListResponse로 변환
-        List<QuestionListResponse> questionListResponses = Arrays.stream(Question.values())
-                .map(q-> QuestionListResponse.create(q, answeredQuestion))
+        List<Question> questionList = Arrays.stream(Question.values())
+                .filter(value -> value.getCategory().equals(category))
                 .collect(Collectors.toList());
 
         // 현재 페이지의 시작 인덱스 계산
         int start = Math.toIntExact(pageRequest.getOffset());
-        int end = Math.min((start + pageRequest.getPageSize()), questionListResponses.size());
-
-        // 현재 페이지에 해당하는 리스트 추출
-        List<QuestionListResponse> currentSlice = questionListResponses.subList(start, end);
+        int end = Math.min((start + pageRequest.getPageSize()), questionList.size());
 
         // 다음 페이지가 있는지 여부를 판단
-        boolean hasNext = end < questionListResponses.size();
+        boolean hasNext = end < questionList.size();
 
-        return new SliceImpl<>(currentSlice, pageRequest, hasNext);
+        // 현재 페이지에 해당하는 리스트 추출
+        questionList = questionList.subList(start, end);
+
+        // QuestionListResponse로 변환
+        List<QuestionListResponse> questionListResponses = questionList.stream()
+                .map(q-> QuestionListResponse.create(q, answeredQuestion))
+                .collect(Collectors.toList());
+
+
+
+        return new SliceImpl<>(questionListResponses, pageRequest, hasNext);
     }
 
 
