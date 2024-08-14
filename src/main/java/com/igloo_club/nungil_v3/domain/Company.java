@@ -1,6 +1,8 @@
 package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.CompanyScale;
+import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.GlobalErrorResult;
 import lombok.*;
 
 import javax.persistence.*;
@@ -35,7 +37,7 @@ public class Company implements Cloneable {
             company.updateScale(scale);
             return company;
         } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
+            throw new GeneralException(GlobalErrorResult.UNKNOWN_EXCEPTION, e);
         }
     }
 
