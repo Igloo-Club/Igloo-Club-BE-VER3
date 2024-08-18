@@ -3,6 +3,9 @@ package com.igloo_club.nungil_v3.domain;
 import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
 import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.IdealResponse;
+import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.IdealErrorResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -83,6 +86,7 @@ public class Member {
     public void updateEmail(String email) {
         this.email = email;
     }
+
     public void addLocation(Location location) {
         this.location.add(location);
     }

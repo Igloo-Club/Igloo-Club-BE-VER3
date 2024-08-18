@@ -1,5 +1,6 @@
 package com.igloo_club.nungil_v3.dto;
 
+import com.igloo_club.nungil_v3.domain.Ideal;
 import com.igloo_club.nungil_v3.domain.enums.MbtiType;
 import com.igloo_club.nungil_v3.domain.enums.Religion;
 import lombok.AccessLevel;
@@ -28,24 +29,15 @@ public class IdealResponse {
     private Integer marriagePlan;
 
     // == 생성 메서드 == //
-    public static IdealResponse create(
-            Integer preferredAgeStart,
-            Integer preferredAgeEnd,
-            Integer preferredHeightStart,
-            Integer preferredHeightEnd,
-            List<MbtiType> mbtiList,
-            Boolean smoke,
-            Religion religion,
-            Integer marriagePlan
-            ) {
+    public static IdealResponse create(Ideal ideal) {
         return new IdealResponse(
-                preferredAgeStart,
-                preferredAgeEnd,
-                preferredHeightStart,
-                preferredHeightEnd,
-                mbtiList,
-                smoke,
-                religion,
-                marriagePlan);
+                ideal.getPreferredAgeStart(),
+                ideal.getPreferredAgeEnd(),
+                ideal.getPreferredHeightStart(),
+                ideal.getPreferredHeightEnd(),
+                ideal.getMbtiList(),
+                ideal.getSmoke(),
+                ideal.getReligion(),
+                ideal.getMarriagePlan());
     }
 }
