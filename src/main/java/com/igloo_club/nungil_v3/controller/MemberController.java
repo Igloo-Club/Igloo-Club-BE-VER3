@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.AdditionalProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.IdealCreateRequest;
 import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
 import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
 import com.igloo_club.nungil_v3.service.CompanyService;
@@ -49,6 +50,15 @@ public class MemberController {
         Member member = getMember(principal);
 
         memberService.createLocation(request, member);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/api/member/ideal")
+    public ResponseEntity<?> createIdeal(@RequestBody IdealCreateRequest request, Principal principal) {
+        Member member = getMember(principal);
+
+        memberService.createIdeal(request, member);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

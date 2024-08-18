@@ -1,8 +1,10 @@
 package com.igloo_club.nungil_v3.service;
 
+import com.igloo_club.nungil_v3.domain.Ideal;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.domain.Profile;
 import com.igloo_club.nungil_v3.dto.AdditionalProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.IdealCreateRequest;
 import com.igloo_club.nungil_v3.dto.LocationCreateRequest;
 import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
 import com.igloo_club.nungil_v3.exception.GeneralException;
@@ -42,5 +44,12 @@ public class MemberService {
     @Transactional
     public void createLocation(LocationCreateRequest request, Member member) {
         member.addLocation(request.getLocation());
+    }
+
+    @Transactional
+    public void createIdeal(IdealCreateRequest request, Member member) {
+
+        Ideal ideal = request.toIdeal();
+        member.createIdeal(ideal);
     }
 }

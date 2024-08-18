@@ -59,6 +59,10 @@ public class Member {
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "ideal_id")
+    private Ideal ideal;
+
     // == 비즈니스 로직 == //
     public void createEssentialProfile(EssentialProfileCreateRequest request) {
         this.nickname = request.getNickname();
@@ -70,6 +74,8 @@ public class Member {
         this.profile = profile;
     }
 
+    public void createIdeal(Ideal ideal) { this.ideal = ideal; }
+
     public void updateCompany(Company company) {
         this.company = company;
     }
@@ -80,4 +86,5 @@ public class Member {
     public void addLocation(Location location) {
         this.location.add(location);
     }
+
 }

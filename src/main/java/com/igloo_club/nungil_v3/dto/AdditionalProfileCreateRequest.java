@@ -23,7 +23,7 @@ public class AdditionalProfileCreateRequest {
 
     private final Integer marriagePlan;
 
-    private final Mbti mbti;
+    private final MbtiType mbtiType;
 
     private final Integer grossSalary;
 
@@ -44,7 +44,7 @@ public class AdditionalProfileCreateRequest {
                 .tattoo(this.tattoo)
                 .smoke(this.smoke)
                 .marriagePlan(this.marriagePlan)
-                .mbti(this.mbti)
+                .mbtiType(this.mbtiType)
                 .grossSalary(this.grossSalary)
                 .job(this.job)
                 .intro(this.intro)

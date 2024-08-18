@@ -36,7 +36,7 @@ public class Profile {
 
     @Column(columnDefinition = "VARCHAR(4)")
     @Enumerated(value = EnumType.STRING)
-    private Mbti mbti;
+    private MbtiType mbtiType;
 
     @Column(columnDefinition = "TINYINT UNSIGNED")
     private Integer grossSalary;
