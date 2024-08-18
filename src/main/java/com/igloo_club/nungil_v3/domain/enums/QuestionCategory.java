@@ -6,11 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum QuestionCategory {
-    LIFESTYLE("LIFESTYLE"),
-    FINANCE("FINANCE"),
-    HOUSEWORK("HOUSEWORK"),
-    VISION("VISION"),
-    FAMILY("FAMILY"),
+    LIFESTYLE,
+    FINANCE,
+    HOUSEWORK,
+    VISION,
+    FAMILY,
     ;
-    private final String title;
 }
