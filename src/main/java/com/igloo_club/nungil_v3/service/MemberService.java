@@ -54,7 +54,6 @@ public class MemberService {
         member.createIdeal(ideal);
     }
 
-    @Transactional
     public IdealResponse getIdeal(Member member) {
 
         Ideal ideal = idealRepository.findById(member.getIdeal().getId())
@@ -62,3 +61,4 @@ public class MemberService {
         return IdealResponse.create(ideal);
     }
 }
+
