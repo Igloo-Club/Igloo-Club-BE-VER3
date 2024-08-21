@@ -47,7 +47,6 @@ public class MemberService {
         member.addLocation(request.getLocation());
     }
 
-    @Transactional
     public void createIdeal(IdealCreateRequest request, Member member) {
 
         Ideal ideal = request.toIdeal();
