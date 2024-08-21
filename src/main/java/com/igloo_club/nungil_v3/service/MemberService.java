@@ -21,8 +21,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    private final CompanyRepository companyRepository;
-
     private final IdealRepository idealRepository;
 
     public Member findById(Long memberId) {
@@ -47,6 +45,7 @@ public class MemberService {
         member.addLocation(request.getLocation());
     }
 
+    @Transactional
     public void createIdeal(IdealCreateRequest request, Member member) {
 
         Ideal ideal = request.toIdeal();
