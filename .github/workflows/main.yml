@@ -34,15 +34,19 @@ jobs:
         run: mkdir -p ./src/main/resources/
       - 
         name: 비어있는 yml 파일 생성
-        run: touch ./src/main/resources/application.yml
+        run: |
+          touch ./src/main/resources/application.yml
+          touch ./src/main/resources/application-deploy.yml
       - 
         name: secrets에 있는 APPLICATION 내용을 yml 파일에 덮어쓰기
-        run: echo "${{secrets.APPLICATION}}" > ./src/main/resources/application.yml
+        run: |
+          echo "${{secrets.APPLICATION}}" > ./src/main/resources/application.yml
+          echo "${{secrets.APPLICATION_DEPLOY}}" > ./src/main/resources/application-deploy.yml
       -
         name: yml 파일 업로드
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: application.yml
+          name: application.yml files
           path: ./src/main/resources/
       -
         name: gradlew 실행권한 부여
