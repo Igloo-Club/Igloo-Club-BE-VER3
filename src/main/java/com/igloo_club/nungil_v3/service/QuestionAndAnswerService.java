@@ -37,11 +37,15 @@ public class QuestionAndAnswerService {
         // 신규 질의 응답 객체 생성
         QuestionAndAnswer qa = QuestionAndAnswerCreateRequest.create(request, member);
         Long order = request.getExposureOrder();
+        QuestionCategory category = request.getQuestion().getCategory();
 
         // DB를 조회해 기존 질의응답 객체 존재할 시 예외 처리
         if(questionAndAnswerRepository.findQuestionAndAnswerByMemberAndQuestion(member, request.getQuestion()).isPresent()){
-            throw  new GeneralException(QuestionAndAnswerErrorResult.ANSWERED_QUESTION);
+            throw new GeneralException(QuestionAndAnswerErrorResult.ANSWERED_QUESTION);
         }
+
+        // 중복된 카테고리 질문 전시 여부 확인
+        handleCategoryConflict(member, category, order);
 
         // 신규 질의 응답과 노출 순서 중복 여부 확인
         // 중복 있을 시 기존 질의 응답 노출 순서 null로 변경
@@ -62,11 +66,18 @@ public class QuestionAndAnswerService {
         QuestionAndAnswer qa = questionAndAnswerRepository.findQuestionAndAnswerById(qaId)
                         .orElseThrow(()-> new GeneralException(QuestionAndAnswerErrorResult.WRONG_ID));
 
+        QuestionCategory questionCategory = qa.getQuestionCategory();
+        Long order = request.getExposureOrder();
+        String answer = request.getAnswer();
+
+        // 중복된 카테고리 질문 전시 여부 확인
+        handleCategoryConflict(member, questionCategory, order);
+
         // 신규 질의 응답과 노출 순서 중복 여부 확인
         // 중복 있을 시 기존 질의 응답 노출 순서 null로 변경
-        handleExposureOrderConflict(member, request.getExposureOrder());
+        handleExposureOrderConflict(member, order);
 
-        qa.update(request.getAnswer(), request.getExposureOrder());
+        qa.update(answer, order);
     }
 
     /**
@@ -81,6 +92,23 @@ public class QuestionAndAnswerService {
             Optional<QuestionAndAnswer> existingQa = questionAndAnswerRepository.findByMemberAndExposureOrder(member, order);
 
             existingQa.ifPresent(originalQa -> originalQa.updateOrderToNull());
+        }
+    }
+
+    /**
+     * 전시 된 질문 카테고리 중복을 처리하는 메소드입니다
+     * 중복이 있을 경우 예외 처리
+     *
+     * @param member 질의응답을 생성하는 회원
+     * @param order 노출 순서
+     */
+    private void handleCategoryConflict(Member member, QuestionCategory category, Long order) {
+        List<QuestionAndAnswer> sameCategoryQaList = questionAndAnswerRepository.findAllByMemberAndQuestionCategory(member, category);
+
+        for(QuestionAndAnswer qa : sameCategoryQaList){
+            if(qa.getExposureOrder() != order && qa.getExposureOrder() != null){
+                throw new GeneralException(QuestionAndAnswerErrorResult.SAME_CATEGORY_QUESTION_EXPOSING);
+            }
         }
     }
 

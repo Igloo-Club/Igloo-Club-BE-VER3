@@ -15,6 +15,8 @@ public class QuestionAndAnswerResponse {
 
     private String questionTitle;
 
+    private String questionSubTitle;
+
     private String answer;
 
     private Long exposureOrder;
@@ -24,6 +26,7 @@ public class QuestionAndAnswerResponse {
         response.qaId = qa.getId();
         response.question = qa.getQuestion();
         response.questionTitle = qa.getQuestion().getTitle();
+        response.questionSubTitle = qa.getQuestion().getSubTitle();
         response.answer = qa.getAnswer();
         response.exposureOrder = qa.getExposureOrder();
 
