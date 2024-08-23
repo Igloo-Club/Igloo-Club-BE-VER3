@@ -1,6 +1,6 @@
 package com.igloo_club.nungil_v3.domain.enums;
 
-public enum Mbti {
+public enum MbtiType {
     ISFP,
     ISFJ,
     ISTP,

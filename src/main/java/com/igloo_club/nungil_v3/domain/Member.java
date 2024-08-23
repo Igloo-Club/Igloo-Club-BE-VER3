@@ -3,6 +3,9 @@ package com.igloo_club.nungil_v3.domain;
 import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
 import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.IdealResponse;
+import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.IdealErrorResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -59,6 +62,10 @@ public class Member {
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "ideal_id")
+    private Ideal ideal;
+
     // == 비즈니스 로직 == //
     public void createEssentialProfile(EssentialProfileCreateRequest request) {
         this.nickname = request.getNickname();
@@ -70,6 +77,8 @@ public class Member {
         this.profile = profile;
     }
 
+    public void createIdeal(Ideal ideal) { this.ideal = ideal; }
+
     public void updateCompany(Company company) {
         this.company = company;
     }
@@ -77,7 +86,9 @@ public class Member {
     public void updateEmail(String email) {
         this.email = email;
     }
+
     public void addLocation(Location location) {
         this.location.add(location);
     }
+
 }
