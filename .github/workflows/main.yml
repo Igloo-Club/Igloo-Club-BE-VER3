@@ -3,8 +3,10 @@ name: Docker build & push
 on:
   push:
     branches: [ "develop" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "develop" ]
+    tags: [ "v*" ]
 
 jobs:
   deploy:
@@ -60,6 +62,7 @@ jobs:
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: ${{secrets.DOCKERHUB_IMAGE}}
+          flavor: latest=true
           tag-semver: |
             {{version}}
       -
