@@ -17,13 +17,13 @@ jobs:
         uses: actions/checkout@v4
       -
         name: JDK 설정
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
       -
         name: Gradle Caching
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -46,7 +46,7 @@ jobs:
           echo "${{secrets.APPLICATION_DEPLOY}}" > ./src/main/resources/application-deploy.yml
       -
         name: yml 파일 업로드
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v4
         with:
           name: application.yml files
           path: ./src/main/resources/
@@ -63,8 +63,7 @@ jobs:
         with:
           images: ${{secrets.DOCKERHUB_IMAGE}}
           flavor: latest=true
-          tag-semver: |
-            {{version}}
+          tags: type=semver,pattern={{version}}
       -
         name: 도커 빌드 셋업
         uses: docker/setup-buildx-action@v3
