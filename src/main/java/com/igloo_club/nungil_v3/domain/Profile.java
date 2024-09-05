@@ -41,9 +41,6 @@ public class Profile {
     @Column(columnDefinition = "TINYINT UNSIGNED")
     private Integer grossSalary;
 
-    @Column(columnDefinition = "VARCHAR(255)")
-    private String job;
-
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<WorkArrangementEntity> workArrangementEntityList = new ArrayList<>();
