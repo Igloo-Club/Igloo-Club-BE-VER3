@@ -27,8 +27,6 @@ public class AdditionalProfileCreateRequest {
 
     private final Integer grossSalary;
 
-    private final String job;
-
     private final List<WorkArrangement> workArrangementList = new ArrayList<>();
 
     private final CompanyScale scale;
@@ -46,7 +44,6 @@ public class AdditionalProfileCreateRequest {
                 .marriagePlan(this.marriagePlan)
                 .mbtiType(this.mbtiType)
                 .grossSalary(this.grossSalary)
-                .job(this.job)
                 .intro(this.intro)
                 .build();
 

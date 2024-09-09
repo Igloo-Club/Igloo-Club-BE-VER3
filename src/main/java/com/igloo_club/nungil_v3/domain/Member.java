@@ -55,6 +55,9 @@ public class Member {
     @Builder.Default
     private boolean agreeMarketing = true;
 
+    @Column(columnDefinition = "VARCHAR(255)")
+    private String job;
+
     @Builder.Default
     private LocalDate createdAt = LocalDate.now();
 
@@ -71,6 +74,7 @@ public class Member {
         this.nickname = request.getNickname();
         this.sex = request.getSex();
         this.birthdate = request.getBirthdate();
+        this.job = request.getJob();
     }
 
     public void createAdditionalProfile(Profile profile) {

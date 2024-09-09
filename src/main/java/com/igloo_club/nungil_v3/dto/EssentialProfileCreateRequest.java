@@ -25,4 +25,6 @@ public class EssentialProfileCreateRequest {
     @Past
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate birthdate;
+
+    private String job;
 }
