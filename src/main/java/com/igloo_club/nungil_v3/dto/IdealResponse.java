@@ -2,7 +2,6 @@ package com.igloo_club.nungil_v3.dto;
 
 import com.igloo_club.nungil_v3.domain.Ideal;
 import com.igloo_club.nungil_v3.domain.enums.MbtiType;
-import com.igloo_club.nungil_v3.domain.enums.Preference;
 import com.igloo_club.nungil_v3.domain.enums.Religion;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,7 @@ public class IdealResponse {
 
     private List<MbtiType> mbtiList;
 
-    private Preference smoke;
+    private Boolean smoke;
 
     private Religion religion;
 

@@ -1,7 +1,6 @@
 package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.MbtiType;
-import com.igloo_club.nungil_v3.domain.enums.Preference;
 import com.igloo_club.nungil_v3.domain.enums.Religion;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,8 +39,7 @@ public class Ideal {
     private List<Mbti> mbtiList = new ArrayList<>();
 
     @Column(columnDefinition = "VARCHAR(20)", nullable = false)
-    @Enumerated(value = EnumType.STRING)
-    private Preference smoke;
+    private Boolean smoke;
 
     @Column(columnDefinition = "VARCHAR(20)")
     @Enumerated(value = EnumType.STRING)
