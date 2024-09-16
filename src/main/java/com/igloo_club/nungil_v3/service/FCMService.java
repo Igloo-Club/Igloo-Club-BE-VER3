@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.igloo_club.nungil_v3.dto.FCMMessageDTO;
 import com.igloo_club.nungil_v3.dto.FCMSendDTO;
-import com.igloo_club.nungil_v3.exception.GeneralException;
-import com.igloo_club.nungil_v3.exception.GlobalErrorResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
@@ -29,15 +27,11 @@ public class FCMService {
      * @param fcmSendDto 모바일에서 전달받은 Object
      * @return 성공(1), 실패(0)
      */
-
     public int sendMessageTo(FCMSendDTO fcmSendDto) throws IOException {
 
         String message = makeMessage(fcmSendDto);
         RestTemplate restTemplate = new RestTemplate();
-        /**
-         * 추가된 사항 : RestTemplate 이용중 클라이언트의 한글 깨짐 증상에 대한 수정
-         * @refernece : https://stackoverflow.com/questions/29392422/how-can-i-tell-resttemplate-to-post-with-utf-8-encoding
-         */
+
         restTemplate.getMessageConverters()
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
@@ -47,7 +41,7 @@ public class FCMService {
 
         HttpEntity entity = new HttpEntity<>(message, headers);
 
-        String API_URL = "<https://fcm.googleapis.com/v1/projects/adjh54-a0189/messages:send>";
+        String API_URL = "https://fcm.googleapis.com/v1/projects/fcmfornungil/messages:send";
         ResponseEntity response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
         System.out.println(response.getStatusCode());
@@ -65,7 +59,7 @@ public class FCMService {
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("<https://www.googleapis.com/auth/cloud-platform>"));
+                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();

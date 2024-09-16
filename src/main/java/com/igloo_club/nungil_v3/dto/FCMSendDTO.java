@@ -1,10 +1,12 @@
 package com.igloo_club.nungil_v3.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder(toBuilder = true)
 public class FCMSendDTO {
     private String token;
 
@@ -12,7 +14,7 @@ public class FCMSendDTO {
 
     private String body;
 
-    @Builder(toBuilder = true)
+
     public FCMSendDTO(String token, String title, String body){
         this.token = token;
         this.title = title;

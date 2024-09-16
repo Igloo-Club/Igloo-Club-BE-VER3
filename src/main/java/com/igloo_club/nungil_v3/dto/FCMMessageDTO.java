@@ -1,5 +1,6 @@
 package com.igloo_club.nungil_v3.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +24,9 @@ public class FCMMessageDTO {
     @Getter
     public static class Notification {
         private String title;
+
         private String body;
+
         private String image;
     }
 }
