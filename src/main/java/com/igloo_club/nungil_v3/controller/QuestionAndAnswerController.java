@@ -49,7 +49,8 @@ public class QuestionAndAnswerController {
 
     @GetMapping("/{qaId}")
     public ResponseEntity<?> getQuestionAndAnswer(
-            @PathVariable Long qaId) {
+            @PathVariable Long qaId,
+            Principal principal) {
 
         QuestionAndAnswerResponse response = questionAndAnswerService.getQuestionAndAnswerResponseByMemberAndQuestion(qaId);
 
