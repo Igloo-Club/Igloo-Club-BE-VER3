@@ -6,6 +6,7 @@ import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
 import com.igloo_club.nungil_v3.dto.IdealResponse;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.IdealErrorResult;
+import com.igloo_club.nungil_v3.exception.MemberErrorResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,4 +97,13 @@ public class Member {
         this.location.add(location);
     }
 
+    public Sex getOppositeSex(){
+        if (this.getSex().equals(Sex.FEMALE)){return Sex.MALE;}
+        if (this.getSex().equals(Sex.MALE)){return Sex.FEMALE;}
+        throw new GeneralException(MemberErrorResult.SEXLESS_USER);
+    }
+    private int calculateAge() {
+        LocalDate currentDate = LocalDate.now();
+        return Period.between(this.getBirthdate(), currentDate).getYears();
+    }
 }
