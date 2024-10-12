@@ -98,4 +98,8 @@ public class Member {
     public void addMemberImage(MemberImage memberImage) {
         this.getMemberImageList().add(memberImage);
     }
+
+    public String getRepresentativeImageFilename() {
+        return this.memberImageList.get(0).getFilename().toString();
+    }
 }

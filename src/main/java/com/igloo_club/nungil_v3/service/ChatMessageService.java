@@ -33,6 +33,8 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
 
+    private final PresignedUrlService presignedUrlService;
+
     /**
      * 채팅 메시지를 데이터베이스에 저장하는 메서드입니다.
      * @param chatDTO 발행된 채팅 메시지 DTO
@@ -143,10 +145,13 @@ public class ChatMessageService {
     public Slice<ChatRoomListResponse> getChatRoomSlice(Member member, PageRequest pageRequest){
         Slice<ChatRoom> chatRoomSlice = chatRoomRepository.findBySenderOrReceiver(member, member, pageRequest);
 
-        return chatRoomSlice.map(chatRoom -> ChatRoomListResponse.create(chatRoom,
-                chatMessageRepository.findTop1ByChatRoomOrderByCreatedAtDesc(chatRoom),
-                getOpponent(chatRoom, member))
-        );
+        return chatRoomSlice.map(chatRoom -> {
+            Member opponent = getOpponent(chatRoom, member);
+            String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
+            ChatMessage lastMessage = chatMessageRepository.findTop1ByChatRoomOrderByCreatedAtDesc(chatRoom);
+
+            return ChatRoomListResponse.create(chatRoom, lastMessage, opponent, imageUrl);
+        });
     }
 
 
