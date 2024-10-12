@@ -35,7 +35,7 @@ public class MemberServiceTest {
     @Test
     public void 필수프로필등록성공() {
         // given
-        EssentialProfileCreateRequest request = new EssentialProfileCreateRequest("닉네임", Sex.MALE, LocalDate.of(2000, 10, 26));
+        EssentialProfileCreateRequest request = new EssentialProfileCreateRequest("닉네임", Sex.MALE, LocalDate.of(2000, 10, 26), "직업");
         Member member = Member.builder().build();
 
         // when

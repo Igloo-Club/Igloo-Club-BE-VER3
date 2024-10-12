@@ -64,6 +64,7 @@ public class MemberProfileResponse {
         response.nickname = member.getNickname();
         response.sex = member.getSex();
         response.birthdate = member.getBirthdate();
+        response.job = member.getJob();
 
         if (profile != null) {
             response.height = profile.getHeight();
@@ -73,7 +74,6 @@ public class MemberProfileResponse {
             response.marriagePlan = profile.getMarriagePlan();
             response.mbti = profile.getMbtiType();
             response.grossSalary = profile.getGrossSalary();
-            response.job = profile.getJob();
             response.workArrangementList = profile.getWorkArrangementList();
             response.hobbyList = profile.getHobbyList().stream()
                     .map(hobby -> new HobbyResponse(hobby.getCategory(), hobby.getName()))
