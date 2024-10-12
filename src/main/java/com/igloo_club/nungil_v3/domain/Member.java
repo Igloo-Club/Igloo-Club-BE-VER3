@@ -3,9 +3,6 @@ package com.igloo_club.nungil_v3.domain;
 import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
 import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
-import com.igloo_club.nungil_v3.dto.IdealResponse;
-import com.igloo_club.nungil_v3.exception.GeneralException;
-import com.igloo_club.nungil_v3.exception.IdealErrorResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,6 +66,9 @@ public class Member {
     @JoinColumn(name = "ideal_id")
     private Ideal ideal;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberImage> memberImageList;
+
     // == 비즈니스 로직 == //
     public void createEssentialProfile(EssentialProfileCreateRequest request) {
         this.nickname = request.getNickname();
@@ -95,4 +95,7 @@ public class Member {
         this.location.add(location);
     }
 
+    public void addMemberImage(MemberImage memberImage) {
+        this.getMemberImageList().add(memberImage);
+    }
 }
