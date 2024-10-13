@@ -109,11 +109,6 @@ public class Member {
         memberChatRoom.setMember(this);
     }
 
-    public void removeMemberChatRoom(MemberChatRoom memberChatRoom) {
-        this.memberChatRoomList.remove(memberChatRoom);
-        memberChatRoom.setMember(null);
-    }
-
     public String getRepresentativeImageFilename() {
         return this.memberImageList.get(0).getFilename().toString();
     }

@@ -71,8 +71,8 @@ public class ChatRoom {
         memberChatRoom.setChatRoom(this);
     }
 
-    public void removeMemberChatRoom(MemberChatRoom memberChatRoom) {
-        this.memberChatRoomList.remove(memberChatRoom);
-        memberChatRoom.setChatRoom(null);
+    public boolean isAllDeleted() {
+        return this.memberChatRoomList.stream()
+                .allMatch(MemberChatRoom::isDeleted);
     }
 }

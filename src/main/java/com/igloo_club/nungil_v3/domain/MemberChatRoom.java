@@ -49,4 +49,10 @@ public class MemberChatRoom {
     public void setAsDeleted() {
         this.isDeleted = true;
     }
+
+    public void removeMember() {
+        this.member.getMemberChatRoomList().remove(this);
+        this.member = null;
+    }
+
 }

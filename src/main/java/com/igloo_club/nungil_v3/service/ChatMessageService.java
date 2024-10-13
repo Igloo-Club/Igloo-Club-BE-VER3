@@ -160,7 +160,7 @@ public class ChatMessageService {
     }
 
     /**
-     * 주어진 채팅방을 삭제하는 메서드입니다.
+     * 주어진 채팅방을 safe-delete 하는 메서드입니다.
      * @param chatRoomId 삭제할 채팅방 id
      * @param member 삭제를 요청한 사용자
      */
@@ -179,6 +179,24 @@ public class ChatMessageService {
 
         memberChatRoom.setAsDeleted();
         memberChatRoomRepository.save(memberChatRoom);
+
+        // 모든 사용자가 해당 채팅방을 삭제 처리한 경우, 채팅방을 영구적으로 삭제한다.
+        if (chatRoom.isAllDeleted()) {
+            deleteChatRoomPermanently(chatRoom);
+        }
+    }
+
+    @Transactional
+    public void deleteChatRoomPermanently(ChatRoom chatRoom) {
+        // 1. 채팅 메시지 엔티티 전체 삭제
+        chatMessageRepository.deleteAllByChatRoom(chatRoom);
+
+        // 2. 사용자-채팅 엔티티 삭제
+        chatRoom.getMemberChatRoomList().forEach(MemberChatRoom::removeMember);
+        memberChatRoomRepository.deleteAllByChatRoom(chatRoom);
+
+        // 3. 채팅방 엔티티 삭제
+        chatRoomRepository.delete(chatRoom);
     }
 
 
