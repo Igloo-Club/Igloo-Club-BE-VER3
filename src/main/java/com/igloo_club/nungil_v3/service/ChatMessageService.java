@@ -90,7 +90,7 @@ public class ChatMessageService {
 
         // 3. 채팅방의 상세 정보 반환
         String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
-        return ChatRoomDetailResponse.create(opponent.getNickname(), imageUrl, chatRoomId, reversedMessageSlice);
+        return ChatRoomDetailResponse.create(opponent.getNickname(), imageUrl, chatRoomId, member.getId(), reversedMessageSlice);
     }
 
     private Member getOpponent(ChatRoom chatRoom, Member member) {
