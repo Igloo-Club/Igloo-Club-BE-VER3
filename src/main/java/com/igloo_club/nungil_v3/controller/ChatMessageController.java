@@ -18,10 +18,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -52,7 +49,7 @@ public class ChatMessageController {
         messagingTemplate.convertAndSend("/topic/" + chatDTO.getChatRoomId(), mappedChat);
     }
 
-    @GetMapping("/api/chat/room/{chatRoomId}")
+    @GetMapping("/api/chatroom/{chatRoomId}")
     public ResponseEntity<ChatRoomDetailResponse> getMessageSlice(@PathVariable Long chatRoomId,
                                                                   @RequestParam(defaultValue = "0") int pageNumber,
                                                                   @RequestParam(defaultValue = "12") int pageSize,
@@ -67,7 +64,7 @@ public class ChatMessageController {
         return new ResponseEntity<>(chatRoomDetail, HttpStatus.OK);
     }
 
-    @GetMapping("/api/chat/room")
+    @GetMapping("/api/chatroom")
     public ResponseEntity<Slice<ChatRoomListResponse>> getRoomSlice(@RequestParam(defaultValue = "0") int pageNumber,
                                                                     @RequestParam(defaultValue = "12") int pageSize,
                                                                     Principal principal) {
@@ -78,6 +75,15 @@ public class ChatMessageController {
         Slice<ChatRoomListResponse> roomSlice = chatMessageService.getChatRoomSlice(member, pageRequest);
 
         return new ResponseEntity<>(roomSlice, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/api/chatroom/{chatRoomId}")
+    public ResponseEntity<?> deleteChatRoom(@PathVariable Long chatRoomId, Principal principal) {
+        Member member = getMember(principal);
+
+        chatMessageService.deleteChatRoom(chatRoomId, member);
+
+        return ResponseEntity.noContent().build();
     }
 
     private Member getMember(Principal principal) {

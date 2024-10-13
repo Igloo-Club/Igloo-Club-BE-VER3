@@ -13,8 +13,8 @@ import java.util.List;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, PagingAndSortingRepository<ChatRoom, Long> {
 
-    Slice<ChatRoom> findBySenderOrReceiver(Member sender, Member receiver, Pageable pageable);
-
-    @Query("select c from ChatRoom c where (c.sender = :member1 and c.receiver = :member2) or (c.sender = :member2 and c.receiver = :member1)")
-    List<ChatRoom> findByMembers(@Param("member1") Member member1, @Param("member2") Member member2);
+    @Query("SELECT DISTINCT cr FROM ChatRoom cr " +
+            "JOIN cr.memberChatRoomList mcr " +
+            "WHERE (cr.sender = :sender OR cr.receiver = :receiver) AND mcr.isDeleted = false")
+    Slice<ChatRoom> findActiveChatRoomByMember(@Param("sender") Member sender, @Param("receiver") Member receiver, Pageable pageable);
 }

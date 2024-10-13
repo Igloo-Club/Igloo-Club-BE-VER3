@@ -66,8 +66,13 @@ public class Member {
     @JoinColumn(name = "ideal_id")
     private Ideal ideal;
 
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberImage> memberImageList;
+    private List<MemberImage> memberImageList = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member")
+    private List<MemberChatRoom> memberChatRoomList = new ArrayList<>();
 
     // == 비즈니스 로직 == //
     public void createEssentialProfile(EssentialProfileCreateRequest request) {
@@ -97,6 +102,16 @@ public class Member {
 
     public void addMemberImage(MemberImage memberImage) {
         this.getMemberImageList().add(memberImage);
+    }
+
+    public void addMemberChatRoom(MemberChatRoom memberChatRoom) {
+        this.memberChatRoomList.add(memberChatRoom);
+        memberChatRoom.setMember(this);
+    }
+
+    public void removeMemberChatRoom(MemberChatRoom memberChatRoom) {
+        this.memberChatRoomList.remove(memberChatRoom);
+        memberChatRoom.setMember(null);
     }
 
     public String getRepresentativeImageFilename() {

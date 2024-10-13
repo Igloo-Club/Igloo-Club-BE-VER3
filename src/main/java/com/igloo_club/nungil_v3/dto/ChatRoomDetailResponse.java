@@ -1,7 +1,5 @@
 package com.igloo_club.nungil_v3.dto;
 
-import com.igloo_club.nungil_v3.domain.Company;
-import com.igloo_club.nungil_v3.domain.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,26 +12,19 @@ public class ChatRoomDetailResponse {
 
     private String nickname;
 
-    private String companyName;
+    private String imageUrl;
 
-    private String job;
+    private Long chatRoomId;
 
-    private Long ownMemberId;
-
-    private Slice<ChatMessageListResponse> messageSlice;
+    private Slice<ChatMessageResponse> messageSlice;
 
 
-    public static ChatRoomDetailResponse create(Member member, Member opponent, Slice<ChatMessageListResponse> messageSlice) {
+    public static ChatRoomDetailResponse create(String nickname, String imageUrl, Long chatRoomId, Slice<ChatMessageResponse> messageSlice) {
         ChatRoomDetailResponse response = new ChatRoomDetailResponse();
 
-        Company company = opponent.getCompany();
-        response.companyName = (company != null) ? company.getCompanyName() : null;
-
-        response.nickname = opponent.getNickname();
-        response.job = opponent.getJob();
-
-        response.ownMemberId = member.getId();
-
+        response.nickname = nickname;
+        response.imageUrl = imageUrl;
+        response.chatRoomId = chatRoomId;
         response.messageSlice = messageSlice;
 
         return response;

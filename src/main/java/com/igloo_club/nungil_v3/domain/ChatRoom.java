@@ -30,6 +30,10 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ChatMessage> chatMessageList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "chatRoom")
+    private List<MemberChatRoom> memberChatRoomList = new ArrayList<>();
+
     private LocalDateTime createdAt;
 
     private LocalDateTime lastMessageAt;
@@ -49,5 +53,10 @@ public class ChatRoom {
     // == 비즈니스 로직 == //
     public void setLastMessageAtToNow(LocalDateTime now) {
         this.lastMessageAt = now;
+    }
+
+    public boolean isInactiveChatRoom() {
+        return this.memberChatRoomList.stream()
+                .anyMatch(MemberChatRoom::isDeleted);
     }
 }

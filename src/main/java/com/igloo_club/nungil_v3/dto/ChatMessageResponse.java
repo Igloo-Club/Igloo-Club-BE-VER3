@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatMessageListResponse {
+public class ChatMessageResponse {
+
+    private Long id;
 
     private String nickname;
 
@@ -20,9 +22,10 @@ public class ChatMessageListResponse {
 
     private Boolean isSender;
 
-    public static ChatMessageListResponse create(Member member, ChatMessage chatMessage, Boolean isSender) {
-        ChatMessageListResponse response = new ChatMessageListResponse();
+    public static ChatMessageResponse create(Member member, ChatMessage chatMessage, Boolean isSender) {
+        ChatMessageResponse response = new ChatMessageResponse();
 
+        response.id = chatMessage.getId();
         response.nickname = member.getNickname();
         response.content = chatMessage.getContent();
         response.createdAt = chatMessage.getCreatedAt();
