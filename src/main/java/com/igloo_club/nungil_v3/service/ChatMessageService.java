@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
 import com.igloo_club.nungil_v3.dto.ChatMessageResponse;
+import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
 import com.igloo_club.nungil_v3.dto.ChatRoomDetailResponse;
 import com.igloo_club.nungil_v3.dto.ChatRoomListResponse;
 import com.igloo_club.nungil_v3.exception.ChatMessageErrorResult;
@@ -208,5 +209,29 @@ public class ChatMessageService {
         chatMessageRepository.save(chatMessage);
 
         return ChatMessageResponse.create(chatMessage.getMember(), chatMessage, isAuthor);
+    }
+
+    /**
+     * 일대일 채팅방을 생성하는 메서드입니다.
+     * @param receiver 채팅방 사용자 1
+     * @param sender 채팅방 사용자 2
+     * @return 채팅방 id를 포함하는 응답 DTO
+     */
+    @Transactional
+    public ChatRoomCreateResponse createChatRoom(Member receiver, Member sender) {
+
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomBetweenMembers(receiver, sender)
+                .orElse(ChatRoom.create(receiver, sender));
+
+        createMemberChatRoomIfNotExist(receiver, chatRoom);
+        createMemberChatRoomIfNotExist(sender, chatRoom);
+
+        return ChatRoomCreateResponse.create(chatRoomRepository.save(chatRoom));
+    }
+
+    private void createMemberChatRoomIfNotExist(Member member, ChatRoom chatRoom) {
+        MemberChatRoom memberChatRoom = memberChatRoomRepository.findByMemberAndChatRoom(member, chatRoom)
+                .orElse(MemberChatRoom.create(member, chatRoom));
+        memberChatRoomRepository.save(memberChatRoom);
     }
 }

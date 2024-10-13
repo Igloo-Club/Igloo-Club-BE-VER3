@@ -9,8 +9,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "chat_room", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"sender_id", "receiver_id"})
@@ -42,15 +40,20 @@ public class ChatRoom {
     private LocalDateTime lastMessageAt;
 
     // == 생성 메서드 == //
+
+    /**
+     * 채팅방 생성이 필요할 시, ChatMessageService.createChatRoom() 메서드를 이용하세요.
+     */
     public static ChatRoom create(Member receiver, Member sender) {
         LocalDateTime now = LocalDateTime.now();
 
-        return ChatRoom.builder()
-                .sender(sender)
-                .receiver(receiver)
-                .createdAt(now)
-                .lastMessageAt(now) // 채팅방 목록 조회 시에 새로 생성된 채팅방이 최상단에 위치하도록 하기 위함
-                .build();
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.sender = sender;
+        chatRoom.receiver = receiver;
+        chatRoom.createdAt = now;
+        chatRoom.lastMessageAt = now;   // 채팅방 목록 조회 시에 새로 생성된 채팅방이 최상단에 위치하도록 하기 위함
+
+        return chatRoom;
     }
 
     // == 비즈니스 로직 == //
@@ -61,5 +64,15 @@ public class ChatRoom {
     public boolean isInactiveChatRoom() {
         return this.memberChatRoomList.stream()
                 .anyMatch(MemberChatRoom::isDeleted);
+    }
+
+    public void addMemberChatRoom(MemberChatRoom memberChatRoom) {
+        this.memberChatRoomList.add(memberChatRoom);
+        memberChatRoom.setChatRoom(this);
+    }
+
+    public void removeMemberChatRoom(MemberChatRoom memberChatRoom) {
+        this.memberChatRoomList.remove(memberChatRoom);
+        memberChatRoom.setChatRoom(null);
     }
 }

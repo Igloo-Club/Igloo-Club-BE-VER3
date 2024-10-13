@@ -24,13 +24,26 @@ public class MemberChatRoom {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "chatRoom_id")
+    @JoinColumn(name = "chatroom_id")
     private ChatRoom chatRoom;
 
     private boolean isDeleted = false;
 
+    public static MemberChatRoom create(Member member, ChatRoom chatRoom) {
+        MemberChatRoom memberChatRoom = new MemberChatRoom();
+
+        member.addMemberChatRoom(memberChatRoom);
+        chatRoom.addMemberChatRoom(memberChatRoom);
+
+        return memberChatRoom;
+    }
+
     public void setMember(Member member) {
         this.member = member;
+    }
+
+    public void setChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
     }
 
     public void setAsDeleted() {
