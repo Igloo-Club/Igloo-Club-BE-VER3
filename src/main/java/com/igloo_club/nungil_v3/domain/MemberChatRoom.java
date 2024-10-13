@@ -11,6 +11,9 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "member_chat_room", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"member_id", "chatroom_id"})
+})
 public class MemberChatRoom {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

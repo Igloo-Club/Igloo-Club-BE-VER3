@@ -168,7 +168,7 @@ public class ChatMessageService {
         ChatRoom chatRoom = getChatRoom(chatRoomId);
 
         // MemberChatRoom 엔티티를 찾지 못한 경우
-        MemberChatRoom memberChatRoom = memberChatRoomRepository.findTop1ByMemberAndChatRoom(member, chatRoom)
+        MemberChatRoom memberChatRoom = memberChatRoomRepository.findByMemberAndChatRoom(member, chatRoom)
                 .orElseThrow(() -> new GeneralException(ChatRoomErrorResult.MEMBER_CHATROOM_NOT_FOUND));
 
         // 이미 사용자에 의해 삭제 처리가 된 채팅방인 경우
