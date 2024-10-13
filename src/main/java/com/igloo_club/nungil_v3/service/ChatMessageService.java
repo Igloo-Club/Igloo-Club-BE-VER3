@@ -4,6 +4,7 @@ import com.igloo_club.nungil_v3.domain.*;
 import com.igloo_club.nungil_v3.dto.ChatMessageResponse;
 import com.igloo_club.nungil_v3.dto.ChatRoomDetailResponse;
 import com.igloo_club.nungil_v3.dto.ChatRoomListResponse;
+import com.igloo_club.nungil_v3.exception.ChatMessageErrorResult;
 import com.igloo_club.nungil_v3.exception.ChatRoomErrorResult;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.repository.ChatMessageRepository;
@@ -116,9 +117,7 @@ public class ChatMessageService {
         List<ChatMessageResponse> responseList = messageSlice.getContent().stream()
                 .map(chatMessage -> {
                     Member sender = chatMessage.getMember();
-                    Boolean isSender = member.getId().equals(sender.getId());
-
-                    return ChatMessageResponse.create(sender, chatMessage, isSender);
+                    return ChatMessageResponse.create(sender, chatMessage, member.isAuthor(chatMessage));
                 }).collect(Collectors.toList());
 
         // 변환된 DTO 리스트와 함께 새로운 Slice 객체를 생성하여 반환
@@ -181,4 +180,33 @@ public class ChatMessageService {
         memberChatRoomRepository.save(memberChatRoom);
     }
 
+
+    /**
+     * 특정 채팅 메시지를 삭제 상태로 변경하는 메서드입니다.
+     * @param chatRoomId 채팅방 id
+     * @param chatMessageId 채팅 메시지 id
+     * @param member 삭제를 요청한 사용자
+     */
+    @Transactional
+    public ChatMessageResponse deleteMessage(Long chatRoomId, Long chatMessageId, Member member) {
+        ChatRoom chatRoom = getChatRoom(chatRoomId);
+        if (isOutsider(chatRoom, member)) {
+            throw new GeneralException(ChatRoomErrorResult.NOT_MEMBER);
+        }
+
+        ChatMessage chatMessage = chatMessageRepository.findTop1ByIdAndChatRoom(chatMessageId, chatRoom)
+                .orElseThrow(() -> new GeneralException(ChatMessageErrorResult.CHAT_MESSAGE_NOT_FOUND));
+
+        // 본인이 작성한 메시지만 삭제 가능
+        boolean isAuthor = member.isAuthor(chatMessage);
+        if (!isAuthor) {
+            throw new GeneralException(ChatMessageErrorResult.ONLY_MESSAGE_AUTHOR_CAN_DELETE);
+        }
+
+        // DB에 있는 메시지 내용을 '삭제된 메시지입니다.'로 변경
+        chatMessage.updateAsDeleted();
+        chatMessageRepository.save(chatMessage);
+
+        return ChatMessageResponse.create(chatMessage.getMember(), chatMessage, isAuthor);
+    }
 }

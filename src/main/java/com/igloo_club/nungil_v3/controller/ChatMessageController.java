@@ -3,6 +3,7 @@ package com.igloo_club.nungil_v3.controller;
 import com.igloo_club.nungil_v3.config.jwt.TokenProvider;
 import com.igloo_club.nungil_v3.domain.ChatDTO;
 import com.igloo_club.nungil_v3.domain.Member;
+import com.igloo_club.nungil_v3.dto.ChatMessageResponse;
 import com.igloo_club.nungil_v3.dto.ChatRoomDetailResponse;
 import com.igloo_club.nungil_v3.dto.ChatRoomListResponse;
 import com.igloo_club.nungil_v3.service.ChatMessageService;
@@ -75,6 +76,15 @@ public class ChatMessageController {
         Slice<ChatRoomListResponse> roomSlice = chatMessageService.getChatRoomSlice(member, pageRequest);
 
         return new ResponseEntity<>(roomSlice, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/api/chat/{chatRoomId}/{chatMessageId}")
+    public ResponseEntity<ChatMessageResponse> deleteMessage(@PathVariable Long chatRoomId, @PathVariable Long chatMessageId, Principal principal) {
+        Member member = getMember(principal);
+
+        ChatMessageResponse response = chatMessageService.deleteMessage(chatRoomId, chatMessageId, member);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/api/chatroom/{chatRoomId}")

@@ -117,4 +117,8 @@ public class Member {
     public String getRepresentativeImageFilename() {
         return this.memberImageList.get(0).getFilename().toString();
     }
+
+    public boolean isAuthor(ChatMessage chatMessage) {
+        return this.id.equals(chatMessage.getMember().getId());
+    }
 }

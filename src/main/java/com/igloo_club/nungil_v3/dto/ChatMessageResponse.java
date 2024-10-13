@@ -20,16 +20,16 @@ public class ChatMessageResponse {
 
     private LocalDateTime createdAt;
 
-    private Boolean isSender;
+    private Boolean isAuthor;
 
-    public static ChatMessageResponse create(Member member, ChatMessage chatMessage, Boolean isSender) {
+    public static ChatMessageResponse create(Member member, ChatMessage chatMessage, Boolean isAuthor) {
         ChatMessageResponse response = new ChatMessageResponse();
 
         response.id = chatMessage.getId();
         response.nickname = member.getNickname();
         response.content = chatMessage.getContent();
         response.createdAt = chatMessage.getCreatedAt();
-        response.isSender = isSender;
+        response.isAuthor = isAuthor;
 
         return response;
     }
