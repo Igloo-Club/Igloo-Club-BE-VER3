@@ -12,6 +12,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "chat_room", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"sender_id", "receiver_id"})
+})
 public class ChatRoom {
 
     @Id
