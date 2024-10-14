@@ -30,4 +30,21 @@ public class Nungil {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "opponent_id")
     private Member opponent;
+
+    // == 정적 생성 메서드 == //
+    public static Nungil create(Member member, Member opponent, NungilStatus status) {
+        return Nungil.builder()
+                .member(member)
+                .opponent(opponent)
+                .createdAt(LocalDateTime.now())
+                .status(status)
+                .build();
+    }
+
+    public void setStatus(NungilStatus status){
+        this.status = status;
+    }
+
+
+
 }
