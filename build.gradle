@@ -52,6 +52,10 @@ dependencies {
 
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
+	// Mapper
+	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 }
 
 tasks.named('test') {
