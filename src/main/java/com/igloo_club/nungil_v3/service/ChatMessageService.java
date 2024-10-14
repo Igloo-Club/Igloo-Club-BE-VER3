@@ -17,6 +17,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +37,8 @@ public class ChatMessageService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
 
+    private final SimpUserRegistry simpUserRegistry;
+
     /**
      * 채팅 메시지를 데이터베이스에 저장하는 메서드입니다.
      * @param chatDTO 발행된 채팅 메시지 DTO
@@ -43,7 +46,7 @@ public class ChatMessageService {
      * @return 기존의 발행된 메시지에서 데이터가 추가된 DTO
      */
     @Transactional
-    public ChatDTO save(ChatDTO chatDTO, Member member) {
+    public ChatDTO sendMessage(ChatDTO chatDTO, Member member) {
 
         ChatRoom chatRoom = getChatRoom(chatDTO.getChatRoomId());
 
@@ -61,7 +64,24 @@ public class ChatMessageService {
         ChatMessage chatMessage = ChatMessage.create(chatRoom, member, chatDTO.getContent());
         chatMessageRepository.save(chatMessage);
 
+        // 수신자가 채팅방에 있으면 READ 상태 메시지 전송
+        Member opponent = chatRoom.getOpponent(member);
+        if (isMemberOnline(opponent.getId(), chatRoom.getId())) {
+            chatMessage.setStatusAsRead();
+            chatMessageRepository.save(chatMessage);
+        }
+
         return ChatDTO.of(chatDTO.getChatRoomId(), member, chatMessage);
+    }
+
+    private boolean isMemberOnline(Long memberId, Long chatRoomId) {
+        return simpUserRegistry.getUsers().stream()
+                .anyMatch(simpUser -> simpUser.getName().equals(String.valueOf(memberId))
+                        && simpUser.getSessions().stream()
+                            .anyMatch(session -> session.getSubscriptions().stream()
+                                .anyMatch(subscription -> subscription.getDestination().equals("/topic/chatroom/" + chatRoomId))
+                        )
+                );
     }
 
     /**
@@ -86,15 +106,11 @@ public class ChatMessageService {
         Slice<ChatMessageResponse> reversedMessageSlice = new SliceImpl<>(reversedContent, pageRequest, messageSlice.hasNext());
 
         // 2. 채팅 상대방 탐색
-        Member opponent = getOpponent(chatRoom, member);
+        Member opponent = chatRoom.getOpponent(member);
 
         // 3. 채팅방의 상세 정보 반환
         String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
         return ChatRoomDetailResponse.create(opponent.getNickname(), imageUrl, chatRoomId, member.getId(), reversedMessageSlice);
-    }
-
-    private Member getOpponent(ChatRoom chatRoom, Member member) {
-        return chatRoom.getSender().equals(member) ? chatRoom.getReceiver() : chatRoom.getSender();
     }
 
     /**
@@ -151,7 +167,7 @@ public class ChatMessageService {
         Slice<ChatRoom> chatRoomSlice = chatRoomRepository.findActiveChatRoomByMember(member, member, pageRequest);
 
         return chatRoomSlice.map(chatRoom -> {
-            Member opponent = getOpponent(chatRoom, member);
+            Member opponent = chatRoom.getOpponent(member);
             String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
             ChatMessage lastMessage = chatMessageRepository.findTop1ByChatRoomOrderByCreatedAtDesc(chatRoom);
 

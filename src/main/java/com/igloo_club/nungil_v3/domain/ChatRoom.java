@@ -1,5 +1,7 @@
 package com.igloo_club.nungil_v3.domain;
 
+import com.igloo_club.nungil_v3.exception.ChatRoomErrorResult;
+import com.igloo_club.nungil_v3.exception.GeneralException;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,11 +29,9 @@ public class ChatRoom {
     @JoinColumn(name = "receiver_id")
     private Member receiver;
 
-    @Builder.Default
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ChatMessage> chatMessageList = new ArrayList<>();
 
-    @Builder.Default
     @OneToMany(mappedBy = "chatRoom")
     private List<MemberChatRoom> memberChatRoomList = new ArrayList<>();
 
@@ -74,5 +74,25 @@ public class ChatRoom {
     public boolean isAllDeleted() {
         return this.memberChatRoomList.stream()
                 .allMatch(MemberChatRoom::isDeleted);
+    }
+
+    public Member getOpponent(Member member) {
+        if (member.equals(this.sender)) {
+            return this.receiver;
+        } else if (member.equals(this.receiver)) {
+            return this.sender;
+        } else {
+            throw new GeneralException(ChatRoomErrorResult.NOT_MEMBER);
+        }
+    }
+
+    public Member getOpponent(Long memberId) {
+        if (memberId.equals(this.sender.getId())) {
+            return this.receiver;
+        } else if (memberId.equals(this.receiver.getId())) {
+            return this.sender;
+        } else {
+            throw new GeneralException(ChatRoomErrorResult.NOT_MEMBER);
+        }
     }
 }

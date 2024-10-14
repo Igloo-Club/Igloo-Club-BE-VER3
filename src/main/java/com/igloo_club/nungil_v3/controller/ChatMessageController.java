@@ -45,9 +45,9 @@ public class ChatMessageController {
         Authentication authentication = tokenProvider.getAuthentication(accessToken);
         Member member = getMember(authentication);
 
-        ChatDTO mappedChat = chatMessageService.save(chatDTO, member);
+        ChatDTO mappedChat = chatMessageService.sendMessage(chatDTO, member);
 
-        messagingTemplate.convertAndSend("/topic/" + chatDTO.getChatRoomId(), mappedChat);
+        messagingTemplate.convertAndSend("/topic/chatroom/" + chatDTO.getChatRoomId(), mappedChat);
     }
 
     @GetMapping("/api/chatroom/{chatRoomId}")

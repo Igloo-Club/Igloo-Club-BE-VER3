@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.repository;
 
 import com.igloo_club.nungil_v3.domain.ChatMessage;
 import com.igloo_club.nungil_v3.domain.ChatRoom;
+import com.igloo_club.nungil_v3.domain.Member;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     @Query("DELETE FROM ChatMessage cm WHERE cm.chatRoom = :chatRoom")
     @Modifying
     void deleteAllByChatRoom(@Param("chatRoom") ChatRoom chatRoom);
+
+    @Query("UPDATE ChatMessage cm SET cm.status = 'READ' WHERE cm.member = :member")
+    @Modifying
+    void updateStatusToReadByMember(@Param("member") Member member);
 }

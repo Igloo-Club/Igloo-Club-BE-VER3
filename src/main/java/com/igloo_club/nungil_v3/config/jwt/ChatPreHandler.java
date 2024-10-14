@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
+
 import static com.igloo_club.nungil_v3.util.TokenUtil.HEADER_AUTHORIZATION;
 import static com.igloo_club.nungil_v3.util.TokenUtil.getAccessToken;
 
@@ -35,6 +37,9 @@ public class ChatPreHandler implements ChannelInterceptor {
             if (tokenProvider.validateToken(token)) {
                 Authentication authentication = tokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                // SimpUserRegistry의 SimpUser의 userName을 Principal의 username(현재 회원 ID)과 동일하게 설정
+                headerAccessor.setUser((Principal) authentication.getPrincipal());
             } else {
                 // ChatErrorHandler 클래스에서 처리하는 예외와 에러 메시지가 "UNAUTHORIZED"로 동일해야 한다.
                 throw new MessageDeliveryException("UNAUTHORIZED");

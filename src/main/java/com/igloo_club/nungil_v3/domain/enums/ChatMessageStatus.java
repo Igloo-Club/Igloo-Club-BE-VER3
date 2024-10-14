@@ -4,4 +4,5 @@ public enum ChatMessageStatus {
     READ,
     UNREAD,
     DELETED,
+    ALL_READ,
 }
