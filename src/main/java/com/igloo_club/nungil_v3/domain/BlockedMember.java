@@ -44,10 +44,15 @@ public class BlockedMember {
         blockedMember.opponent = opponent;
         blockedMember.status = status;
         blockedMember.createdAt = LocalDateTime.now();
+        if(NungilStatus.RECOMMENDED.equals(status)){
+            blockedMember.sentAt = LocalDateTime.now();
+            blockedMember.expiredAt = blockedMember.sentAt.plusDays(7);
+        }
         if(NungilStatus.RECEIVED.equals(status)){ // 수정 요망
             blockedMember.sentAt = LocalDateTime.now();
             blockedMember.expiredAt = blockedMember.sentAt.plusDays(7);
         }
+
 
         return blockedMember;
     }
