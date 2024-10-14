@@ -97,6 +97,10 @@ public class Member {
         this.location.add(location);
     }
 
+    public void resetDrawCount(){
+        this.drawCount = 0L;
+    }
+
     public void plusDrawCount() {this.drawCount += 1L;}
 
     public Sex getOppositeSex(){

@@ -10,6 +10,7 @@ import com.igloo_club.nungil_v3.repository.BlockedMemberRepository;
 import com.igloo_club.nungil_v3.repository.MemberRepository;
 import com.igloo_club.nungil_v3.repository.NungilRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -166,6 +167,20 @@ public class NungilService {
         return false;
     }
 
+    /**
+     * 뽑기 횟수를 초기화하는 메서드이다.
+     * 매일 11시, 18시에 발생
+     *
+     * @return 초과한 경우 true, 제한 횟수가 남은 경우 false
+     */
+    @Scheduled(cron = "0 0 11,18 * * *")
+    @Transactional
+    private void resetDrawCountForAllMembers() {
+        List<Member> allMembers = memberRepository.findAll();
+        for (Member member : allMembers) {
+            member.resetDrawCount();
+        }
+    }
 
     /**
      * BlockedMember 데이터베이스에 member와 opponent로 구성된 데이터가 없는 경우 생성하고, 있는 경우 조회하여 반환하는 메서드이다.
