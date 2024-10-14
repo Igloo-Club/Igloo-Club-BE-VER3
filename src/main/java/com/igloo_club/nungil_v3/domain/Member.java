@@ -97,12 +97,14 @@ public class Member {
         this.location.add(location);
     }
 
+    public void plusDrawCount() {this.drawCount += 1L;}
+
     public Sex getOppositeSex(){
         if (this.getSex().equals(Sex.FEMALE)){return Sex.MALE;}
         if (this.getSex().equals(Sex.MALE)){return Sex.FEMALE;}
         throw new GeneralException(MemberErrorResult.SEXLESS_USER);
     }
-    private int calculateAge() {
+    public int calculateAge() {
         LocalDate currentDate = LocalDate.now();
         return Period.between(this.getBirthdate(), currentDate).getYears();
     }
