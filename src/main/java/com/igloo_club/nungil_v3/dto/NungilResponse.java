@@ -30,4 +30,5 @@ public class NungilResponse {
     private Integer marriagePlan;
 
     private MbtiType mbtiType;
+
 }
