@@ -110,7 +110,7 @@ public class ChatMessageService {
 
         // 3. 채팅방의 상세 정보 반환
         String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
-        return ChatRoomDetailResponse.create(opponent.getNickname(), imageUrl, chatRoomId, member.getId(), reversedMessageSlice);
+        return ChatRoomDetailResponse.create(opponent.getNickname(), imageUrl, chatRoomId, member.getId(), chatRoom.isInactiveChatRoom(), reversedMessageSlice);
     }
 
     /**
@@ -256,6 +256,7 @@ public class ChatMessageService {
 
         ChatRoom chatRoom = chatRoomRepository.findChatRoomBetweenMembers(receiver, sender)
                 .orElse(ChatRoom.create(receiver, sender));
+        chatRoomRepository.save(chatRoom);
 
         createMemberChatRoomIfNotExist(receiver, chatRoom);
         createMemberChatRoomIfNotExist(sender, chatRoom);
@@ -263,7 +264,8 @@ public class ChatMessageService {
         return ChatRoomCreateResponse.create(chatRoomRepository.save(chatRoom));
     }
 
-    private void createMemberChatRoomIfNotExist(Member member, ChatRoom chatRoom) {
+    @Transactional
+    public void createMemberChatRoomIfNotExist(Member member, ChatRoom chatRoom) {
         MemberChatRoom memberChatRoom = memberChatRoomRepository.findByMemberAndChatRoom(member, chatRoom)
                 .orElse(MemberChatRoom.create(member, chatRoom));
         memberChatRoomRepository.save(memberChatRoom);
