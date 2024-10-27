@@ -76,16 +76,6 @@ public class ChatRoom {
                 .allMatch(MemberChatRoom::isDeleted);
     }
 
-    public Member getOpponent(Member member) {
-        if (member.equals(this.sender)) {
-            return this.receiver;
-        } else if (member.equals(this.receiver)) {
-            return this.sender;
-        } else {
-            throw new GeneralException(ChatRoomErrorResult.NOT_MEMBER);
-        }
-    }
-
     public Member getOpponent(Long memberId) {
         if (memberId.equals(this.sender.getId())) {
             return this.receiver;

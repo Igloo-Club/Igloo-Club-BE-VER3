@@ -65,7 +65,7 @@ public class ChatMessageService {
         chatMessageRepository.save(chatMessage);
 
         // 수신자가 채팅방에 있으면 READ 상태 메시지 전송
-        Member opponent = chatRoom.getOpponent(member);
+        Member opponent = chatRoom.getOpponent(member.getId());
         if (isMemberOnline(opponent.getId(), chatRoom.getId())) {
             chatMessage.setStatusAsRead();
             chatMessageRepository.save(chatMessage);
@@ -106,7 +106,7 @@ public class ChatMessageService {
         Slice<ChatMessageResponse> reversedMessageSlice = new SliceImpl<>(reversedContent, pageRequest, messageSlice.hasNext());
 
         // 2. 채팅 상대방 탐색
-        Member opponent = chatRoom.getOpponent(member);
+        Member opponent = chatRoom.getOpponent(member.getId());
 
         // 3. 채팅방의 상세 정보 반환
         String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
@@ -167,7 +167,7 @@ public class ChatMessageService {
         Slice<ChatRoom> chatRoomSlice = chatRoomRepository.findActiveChatRoomByMember(member, member, pageRequest);
 
         return chatRoomSlice.map(chatRoom -> {
-            Member opponent = chatRoom.getOpponent(member);
+            Member opponent = chatRoom.getOpponent(member.getId());
             String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
             ChatMessage lastMessage = chatMessageRepository.findTop1ByChatRoomOrderByCreatedAtDesc(chatRoom);
 
