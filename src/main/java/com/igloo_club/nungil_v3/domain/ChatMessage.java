@@ -54,7 +54,6 @@ public class ChatMessage {
 
     public void updateAsDeleted() {
         this.status = ChatMessageStatus.DELETED;
-        this.content = "삭제된 메시지입니다.";
     }
 
     public void setStatusAsRead() {

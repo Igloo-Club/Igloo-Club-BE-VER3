@@ -13,10 +13,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.chatRoom = :chatRoom AND cm.status <> 'DELETED'")
+    Slice<ChatMessage> findByChatRoom(@Param("chatRoom") ChatRoom chatRoom, PageRequest pageRequest);
 
-    Slice<ChatMessage> findByChatRoom(PageRequest pageRequest, ChatRoom chatRoom);
-
-    ChatMessage findTop1ByChatRoomOrderByCreatedAtDesc(ChatRoom chatRoom);
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.chatRoom = :chatRoom AND cm.status <> 'DELETED' ORDER BY cm.createdAt DESC")
+    ChatMessage findTop1LastMessage(@Param("chatRoom") ChatRoom chatRoom, PageRequest pageRequest);
 
     Optional<ChatMessage> findTop1ByIdAndChatRoom(Long id, ChatRoom chatRoom);
 

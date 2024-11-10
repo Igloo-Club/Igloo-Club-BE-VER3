@@ -11,13 +11,14 @@ import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.repository.ChatMessageRepository;
 import com.igloo_club.nungil_v3.repository.ChatRoomRepository;
 import com.igloo_club.nungil_v3.repository.MemberChatRoomRepository;
+import com.igloo_club.nungil_v3.util.RedisKeyManager;
+import com.igloo_club.nungil_v3.util.SetRedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.messaging.simp.user.SimpUserRegistry;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +38,7 @@ public class ChatMessageService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
 
-    private final SimpUserRegistry simpUserRegistry;
+    private final SetRedisUtil redisUtil;
 
     /**
      * 채팅 메시지를 데이터베이스에 저장하는 메서드입니다.
@@ -66,7 +67,7 @@ public class ChatMessageService {
 
         // 수신자가 채팅방에 있으면 READ 상태 메시지 전송
         Member opponent = chatRoom.getOpponent(member.getId());
-        if (isMemberOnline(opponent.getId(), chatRoom.getId())) {
+        if (isMemberOnline(chatRoom.getId(), opponent.getId())) {
             chatMessage.setStatusAsRead();
             chatMessageRepository.save(chatMessage);
         }
@@ -74,14 +75,8 @@ public class ChatMessageService {
         return ChatDTO.of(chatDTO.getChatRoomId(), member, chatMessage);
     }
 
-    private boolean isMemberOnline(Long memberId, Long chatRoomId) {
-        return simpUserRegistry.getUsers().stream()
-                .anyMatch(simpUser -> simpUser.getName().equals(String.valueOf(memberId))
-                        && simpUser.getSessions().stream()
-                            .anyMatch(session -> session.getSubscriptions().stream()
-                                .anyMatch(subscription -> subscription.getDestination().equals("/topic/chatroom/" + chatRoomId))
-                        )
-                );
+    private boolean isMemberOnline(Long chatRoomId, Long memberId) {
+        return redisUtil.exists(RedisKeyManager.getChatRoomMemberKey(chatRoomId, memberId));
     }
 
     /**
@@ -128,7 +123,7 @@ public class ChatMessageService {
         }
 
         // 주어진 채팅방의 메시지들을 pageRequest에 맞추어 조회
-        Slice<ChatMessage> messageSlice = chatMessageRepository.findByChatRoom(pageRequest, chatRoom);
+        Slice<ChatMessage> messageSlice = chatMessageRepository.findByChatRoom(chatRoom, pageRequest);
 
         // 메시지들을 DTO 리스트로 변환
         List<ChatMessageResponse> responseList = messageSlice.getContent().stream()
@@ -169,7 +164,7 @@ public class ChatMessageService {
         return chatRoomSlice.map(chatRoom -> {
             Member opponent = chatRoom.getOpponent(member.getId());
             String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
-            ChatMessage lastMessage = chatMessageRepository.findTop1ByChatRoomOrderByCreatedAtDesc(chatRoom);
+            ChatMessage lastMessage = chatMessageRepository.findTop1LastMessage(chatRoom, PageRequest.of(0, 1));
 
             return ChatRoomListResponse.create(chatRoom, lastMessage, opponent, imageUrl);
         });
@@ -238,7 +233,7 @@ public class ChatMessageService {
             throw new GeneralException(ChatMessageErrorResult.ONLY_MESSAGE_AUTHOR_CAN_DELETE);
         }
 
-        // DB에 있는 메시지 내용을 '삭제된 메시지입니다.'로 변경
+        // DB에 있는 메시지의 상태만 'DELETED'로 변경
         chatMessage.updateAsDeleted();
         chatMessageRepository.save(chatMessage);
 
