@@ -29,4 +29,8 @@ public class StringRedisUtil {
     public void delete(String key) {
         template.delete(key);
     }
+
+    public String getAndExpire(String key, Duration timeout) {
+        return template.opsForValue().getAndExpire(key, timeout);
+    }
 }

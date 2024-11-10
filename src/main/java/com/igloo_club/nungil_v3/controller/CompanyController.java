@@ -128,6 +128,24 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping("/api/company/email/renew")
+    @Operation(summary = "회사인증 시간갱신", description = "회사 인증번호의 유효시간을 연장하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400_UNAVAILABLE_EMAIL", description = "사용이 불가능한 이메일(e.g. gmail.com)인 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(example = "{\"code\": \"UNAVAILABLE_EMAIL\", \"message\": \"Given email is not available\"}"))),
+            @ApiResponse(responseCode = "400_REDIS_NOT_FOUND", description = "요청된 회사 이메일에 대한 인증번호가 없거나 만료된 경우",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(example = "{\"code\": \"REDIS_NOT_FOUND\", \"message\": \"The requested data is not available or has expired\"}"))),
+    })
+    public ResponseEntity<?> renewAuthEmail(@RequestBody CompanyEmailRequest request, Principal principal) {
+        Member member = getMember(principal);
+
+        companyService.renewAuthEmail(request.getEmail(), member);
+
+        return ResponseEntity.ok(null);
+    }
+
     private Member getMember(Principal principal) {
         return memberService.findById(Long.parseLong(principal.getName()));
     }
