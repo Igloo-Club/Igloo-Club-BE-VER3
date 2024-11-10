@@ -38,7 +38,7 @@ public class Ideal {
     @Builder.Default
     private List<Mbti> mbtiList = new ArrayList<>();
 
-    @Column
+    @Column(columnDefinition = "VARCHAR(20)", nullable = false)
     private Boolean smoke;
 
     @Column(columnDefinition = "VARCHAR(20)")

@@ -21,7 +21,7 @@ public class Mbti {
     private long id;
 
     @NotNull
-    @Column(columnDefinition = "VARCHAR(20)", nullable = false)
+    @Column(columnDefinition = "VARCHAR(4)", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private MbtiType mbtiType;
 

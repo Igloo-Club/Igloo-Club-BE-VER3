@@ -37,9 +37,6 @@ public class AdditionalProfileCreateRequest {
     @Schema(description = "세전 연봉", example = "4")
     private final Integer grossSalary;
 
-    @Schema(description = "직무", example = "개발자")
-    private final String job;
-
     @ArraySchema(schema = @Schema(description = "근무 형태", example = "ROTATIONAL"))
     private final List<WorkArrangement> workArrangementList = new ArrayList<>();
 
@@ -64,7 +61,6 @@ public class AdditionalProfileCreateRequest {
                 .marriagePlan(this.marriagePlan)
                 .mbtiType(this.mbtiType)
                 .grossSalary(this.grossSalary)
-                .job(this.job)
                 .intro(this.intro)
                 .build();
 

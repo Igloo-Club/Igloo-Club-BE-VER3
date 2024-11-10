@@ -12,7 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
@@ -88,6 +91,34 @@ public class MemberController {
         Member member = getMember(principal);
 
         IdealResponse response = memberService.getIdeal(member);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("/api/member/images")
+    public ResponseEntity<?> getImageUploadUrl(Principal principal) {
+        Member member = getMember(principal);
+
+        MemberImageUploadUrlCreateResponse response = memberService.getImageUploadUrl(member);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/member/images/notify")
+    public ResponseEntity<?> notifyImageUpload(@RequestBody ImageUploadNotifyRequest request, Principal principal) {
+        Member member = getMember(principal);
+
+        memberService.notifyImageUpload(request.getFilename(), request.getStatus(), member);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/api/member")
+    public ResponseEntity<?> getMemberProfile(Principal principal) {
+        Member member = getMember(principal);
+
+        MemberProfileResponse response = memberService.getMemberProfile(member);
 
         return ResponseEntity.ok(response);
     }

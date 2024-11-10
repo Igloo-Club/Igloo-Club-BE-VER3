@@ -29,4 +29,6 @@ public class EssentialProfileCreateRequest {
     @JsonFormat(pattern = "yyyyMMdd")
     @Schema(description = "생년월일", example = "20001026")
     private LocalDate birthdate;
+
+    private String job;
 }
