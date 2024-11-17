@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 
 public enum FCMErrorResult implements ErrorResult{
     NO_FCM_TOKEN(HttpStatus.BAD_REQUEST, "There is no FCM Token on database"),
-    FCM_TOKEN_NOT_VALID(HttpStatus.BAD_REQUEST, "FCM Token is valid"),
+    FCM_TOKEN_NOT_VALID(HttpStatus.BAD_REQUEST, "FCM Token is not valid"),
     ;
     private final HttpStatus httpStatus;
     private final String message;
