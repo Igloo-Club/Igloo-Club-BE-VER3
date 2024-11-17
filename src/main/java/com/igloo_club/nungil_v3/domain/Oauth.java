@@ -44,5 +44,9 @@ public class Oauth {
         return this;
     }
 
+    public void fcmTokenUpdate(String fcmToken){
+        this.fcmToken = fcmToken;
+    }
+
     public void deleteFCMToken(){this.fcmToken = null;}
 }

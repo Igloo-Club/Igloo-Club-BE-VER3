@@ -3,12 +3,15 @@ package com.igloo_club.nungil_v3.controller;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.ApiResponseWrapper;
 import com.igloo_club.nungil_v3.dto.FCMSendDTO;
+import com.igloo_club.nungil_v3.exception.FCMErrorResult;
+import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.service.MemberService;
 import com.igloo_club.nungil_v3.service.FCMService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,20 +28,26 @@ public class FCMController {
     private final MemberService memberService;
 
 
-    @PostMapping("/api/send")
+    @PostMapping("/api/fcm/send")
     public ResponseEntity<ApiResponseWrapper<Object>> pushMessage(@RequestBody @Validated FCMSendDTO fcmSendDto, Principal principal) throws IOException {
         Member member = getMember(principal);
-        int result = fcmService.sendMessageTo(fcmSendDto, member);
+        fcmService.sendMessageTo(fcmSendDto, member);
 
-        ApiResponseWrapper<Object> arw = ApiResponseWrapper
-                .builder()
-                .result(result)
-                .resultCode(200)
-                .resultMsg("FCM message sent successfully")
-                .build();
-
-        return new ResponseEntity<>(arw, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/api/fcm/refresh")
+    public ResponseEntity<?> refreshFCMToken(@CookieValue(value = "fcm_token", required = false) String fcmToken, Principal principal) {
+        if (fcmToken == null) {
+            throw new GeneralException(FCMErrorResult.FCM_TOKEN_NOT_FOUND);
+        }
+        Member member = getMember(principal);
+
+        fcmService.updateFCMToken(fcmToken, member);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     private Member getMember(Principal principal) {
         return memberService.findById(Long.parseLong(principal.getName()));
     }

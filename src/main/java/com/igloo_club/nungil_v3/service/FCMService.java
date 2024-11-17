@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -39,7 +40,7 @@ public class FCMService {
      * @param fcmSendDto 모바일에서 전달받은 Object
      * @return 성공(1), 실패(0)
      */
-    public int sendMessageTo(FCMSendDTO fcmSendDto, Member member) throws IOException {
+    public void sendMessageTo(FCMSendDTO fcmSendDto, Member member) throws IOException {
 
         String message = makeMessage(fcmSendDto, member);
         RestTemplate restTemplate = new RestTemplate();
@@ -56,12 +57,7 @@ public class FCMService {
         String API_URL = "https://fcm.googleapis.com/v1/projects/fcmfornungil/messages:send";
 
         try{
-            ResponseEntity response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
-
-            System.out.println(response.getStatusCode());
-
-            return response.getStatusCode() == HttpStatus.OK ? 1 : 0;
-
+            restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
         }catch(HttpClientErrorException ex){
             // 에러 발생 시
             if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
@@ -71,7 +67,7 @@ public class FCMService {
 
                 // 토큰 부재
                 if (errorMessage.contains("Recipient of the message is not set")) {
-                    throw new GeneralException(FCMErrorResult.NO_FCM_TOKEN);
+                    throw new GeneralException(FCMErrorResult.NO_FCM_TOKEN_IN_DB);
                 }
 
                 // 잘못된 토큰
@@ -126,5 +122,12 @@ public class FCMService {
                         ).build()).validateOnly(false).build();
 
         return om.writeValueAsString(fcmMessageDto);
+    }
+
+
+    public void updateFCMToken(String fcmToken, Member member) {
+        Oauth oauth = oauthRepository.findByMemberAndOauthProvider(member, OauthProvider.KAKAO)
+                .orElseThrow(()->new GeneralException(TokenErrorResult.UNEXPECTED_TOKEN));
+        oauth.fcmTokenUpdate(fcmToken);
     }
 }
