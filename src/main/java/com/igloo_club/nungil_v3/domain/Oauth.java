@@ -43,4 +43,6 @@ public class Oauth {
 
         return this;
     }
+
+    public void deleteFCMToken(){this.FCMToken = null;}
 }

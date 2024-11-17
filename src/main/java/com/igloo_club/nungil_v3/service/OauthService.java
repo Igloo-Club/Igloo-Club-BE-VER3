@@ -144,6 +144,9 @@ public class OauthService {
 
         // 3. 카카오로 로그아웃 요청 보내기
         logoutKakao(oauthAccessToken);
+
+        // 4. 유저의 FCM 토큰 삭제
+        oauth.deleteFCMToken();
     }
 
     private void addRefreshTokenToCookie(HttpServletRequest request, HttpServletResponse response, String refreshToken) {
