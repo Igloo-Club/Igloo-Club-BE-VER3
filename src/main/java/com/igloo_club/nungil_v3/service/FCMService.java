@@ -8,7 +8,9 @@ import com.igloo_club.nungil_v3.domain.Oauth;
 import com.igloo_club.nungil_v3.domain.enums.OauthProvider;
 import com.igloo_club.nungil_v3.dto.FCMMessageDTO;
 import com.igloo_club.nungil_v3.dto.FCMSendDTO;
+import com.igloo_club.nungil_v3.exception.FCMErrorResult;
 import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.QuestionAndAnswerErrorResult;
 import com.igloo_club.nungil_v3.exception.TokenErrorResult;
 import com.igloo_club.nungil_v3.repository.OauthRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.http.*;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -51,11 +54,36 @@ public class FCMService {
         HttpEntity entity = new HttpEntity<>(message, headers);
 
         String API_URL = "https://fcm.googleapis.com/v1/projects/fcmfornungil/messages:send";
-        ResponseEntity response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
-        System.out.println(response.getStatusCode());
+        try{
+            ResponseEntity response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
-        return response.getStatusCode() == HttpStatus.OK ? 1 : 0;
+            System.out.println(response.getStatusCode());
+
+            return response.getStatusCode() == HttpStatus.OK ? 1 : 0;
+
+        }catch(HttpClientErrorException ex){
+            // 에러 발생 시
+            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                // 에러 메시지를 파싱
+            String errorMessage = ex.getResponseBodyAsString();
+            System.err.println("FCM Push Request Failed: " + errorMessage);
+
+                // 토큰 부재
+                if (errorMessage.contains("Recipient of the message is not set")) {
+                    throw new GeneralException(FCMErrorResult.NO_FCM_TOKEN);
+                }
+
+                // 잘못된 토큰
+                if (errorMessage.contains("The registration token is not a valid FCM registration token")) {
+                    throw new GeneralException(FCMErrorResult.FCM_TOKEN_NOT_VALID);
+                }
+
+                throw new RuntimeException("FCM Push failed: " + errorMessage, ex);
+            } else {
+                throw ex;
+            }
+        }
     }
 
     /**
