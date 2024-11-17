@@ -5,7 +5,6 @@ import com.igloo_club.nungil_v3.dto.*;
 import com.igloo_club.nungil_v3.service.CompanyService;
 import com.igloo_club.nungil_v3.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

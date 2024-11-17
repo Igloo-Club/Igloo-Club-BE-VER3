@@ -252,6 +252,7 @@ public class OauthService {
                 .orElse(Oauth.builder()
                         .oauthProvider(OauthProvider.KAKAO)
                         .oauthId(oauthId)
+                        .fcmToken(fcmToken)
                         .build());
 
         Member member = oauth.getMember();

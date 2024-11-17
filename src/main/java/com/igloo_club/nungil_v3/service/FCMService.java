@@ -3,8 +3,14 @@ package com.igloo_club.nungil_v3.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.igloo_club.nungil_v3.domain.Member;
+import com.igloo_club.nungil_v3.domain.Oauth;
+import com.igloo_club.nungil_v3.domain.enums.OauthProvider;
 import com.igloo_club.nungil_v3.dto.FCMMessageDTO;
 import com.igloo_club.nungil_v3.dto.FCMSendDTO;
+import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.TokenErrorResult;
+import com.igloo_club.nungil_v3.repository.OauthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
@@ -21,15 +27,18 @@ import java.util.List;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class FCMService {
+
+    private final OauthRepository oauthRepository;
+
     /**
      * 푸시 메시지 처리를 수행하는 비즈니스 로직
      *
      * @param fcmSendDto 모바일에서 전달받은 Object
      * @return 성공(1), 실패(0)
      */
-    public int sendMessageTo(FCMSendDTO fcmSendDto) throws IOException {
+    public int sendMessageTo(FCMSendDTO fcmSendDto, Member member) throws IOException {
 
-        String message = makeMessage(fcmSendDto);
+        String message = makeMessage(fcmSendDto, member);
         RestTemplate restTemplate = new RestTemplate();
 
         restTemplate.getMessageConverters()
@@ -71,12 +80,16 @@ public class FCMService {
      * @param fcmSendDto FcmSendDto
      * @return String
      */
-    private String makeMessage(FCMSendDTO fcmSendDto) throws JsonProcessingException {
+    private String makeMessage(FCMSendDTO fcmSendDto, Member member) throws JsonProcessingException {
+
+        Oauth oauth = oauthRepository.findByMemberAndOauthProvider(member, OauthProvider.KAKAO)
+                .orElseThrow(()->new GeneralException(TokenErrorResult.UNEXPECTED_TOKEN));
+        String fcmToken = oauth.getFcmToken();
 
         ObjectMapper om = new ObjectMapper();
         FCMMessageDTO fcmMessageDto = FCMMessageDTO.builder()
                 .message(FCMMessageDTO.Message.builder()
-                        .token(fcmSendDto.getToken())
+                        .token(fcmToken)
                         .notification(FCMMessageDTO.Notification.builder()
                                 .title(fcmSendDto.getTitle())
                                 .body(fcmSendDto.getBody())

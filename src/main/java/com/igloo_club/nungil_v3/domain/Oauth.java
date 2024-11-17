@@ -29,11 +29,11 @@ public class Oauth {
 
     private String oauthId;
 
-    private String FCMToken;
+    private String fcmToken;
 
     public Oauth update(String oauthAccessToken, String fcmToken) {
         this.oauthAccessToken = oauthAccessToken;
-        this.FCMToken = fcmToken;
+        this.fcmToken = fcmToken;
 
         return this;
     }
@@ -44,5 +44,5 @@ public class Oauth {
         return this;
     }
 
-    public void deleteFCMToken(){this.FCMToken = null;}
+    public void deleteFCMToken(){this.fcmToken = null;}
 }
