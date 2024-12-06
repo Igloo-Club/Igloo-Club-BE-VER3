@@ -53,6 +53,13 @@ dependencies {
 	// Swagger
 	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
 
+	// Firebase Admin SDK
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+	// Jackson Data Bind
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'
+
+
 	// Mapper
 	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'

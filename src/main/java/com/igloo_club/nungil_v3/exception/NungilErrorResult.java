@@ -7,9 +7,9 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum NungilErrorResult implements ErrorResult{
-    LIMIT_EXCEEDED(HttpStatus.FORBIDDEN, "You have exceeded the limit"),
+    LIMIT_EXCEEDED(HttpStatus.FORBIDDEN, "Member exceeded the limit"),
     OUT_OF_TIME(HttpStatus.BAD_REQUEST, "Not appropriate time for free recommendation."),
-
+    NO_RECOMMENDATION(HttpStatus.NO_CONTENT, "No one has been recommended.")
     ;
 
     private final HttpStatus httpStatus;

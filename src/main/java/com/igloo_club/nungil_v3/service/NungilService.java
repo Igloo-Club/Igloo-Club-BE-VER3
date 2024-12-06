@@ -54,7 +54,9 @@ public class NungilService {
 
         // 3. 회원 한 명을 추천받는다.
         Member recommendedMember = getRecommendedMember(member);
-        if (recommendedMember == null) return null;
+        if (recommendedMember == null) {
+            throw new GeneralException(NungilErrorResult.NO_RECOMMENDATION);
+        }
 
         // 4. 추천 받은 회원에 대한 차단(중복방지)를 생성하고 저장한다.
         BlockedMember blockedMember = getBlockedMember(member, recommendedMember);
