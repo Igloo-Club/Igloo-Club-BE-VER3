@@ -82,8 +82,16 @@ public class NungilService {
                 .map(blockedMember -> blockedMember.getOpponent().getId())
                 .collect(Collectors.toList());
 
+        // Block된 멤버와 위치를 기준으로 membersList 필터링
+        membersList = membersList.stream()
+                .filter(member -> !blockedMemberIds.contains(member.getId())) // Block된 멤버 제외
+                .filter(member -> member.getLocation().stream()
+                        .anyMatch(location -> currentMember.getLocation().contains(location))) // location 비교
+                .collect(Collectors.toList());
+
         Ideal ideal = currentMember.getIdeal();
         Map<Member, Integer> similarityMap = new HashMap<>(); // 각 멤버와 선호를 저장할 맵
+
         for (Member member : membersList){
             int similarityCount = 0;
 
@@ -127,10 +135,6 @@ public class NungilService {
 
         }
         List<Member> recommendingMembersList = similarityMap.entrySet().stream()
-                .filter(entry -> !blockedMemberIds.contains(entry.getKey().getId())) // Block된 멤버 제외
-                .filter(entry ->
-                        entry.getKey().getLocation().stream()
-                                .anyMatch(location -> currentMember.getLocation().contains(location))) // location 비교
                 .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
