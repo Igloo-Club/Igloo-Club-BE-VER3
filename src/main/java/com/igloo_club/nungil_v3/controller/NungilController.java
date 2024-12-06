@@ -23,10 +23,6 @@ public class NungilController {
     public ResponseEntity<NungilResponse> recommendMember(Principal principal){
         Member member = getMember(principal);
         NungilResponse nungilResponse = nungilService.recommendMember(member);
-        if (nungilResponse == null){
-            //추천할 사용자가 없는 경우
-            return ResponseEntity.ok(null);
-        }
         return ResponseEntity.ok(nungilResponse);
     }
 
