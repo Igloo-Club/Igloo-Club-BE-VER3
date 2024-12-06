@@ -8,6 +8,7 @@ import com.igloo_club.nungil_v3.dto.QuestionAndAnswerUpdateRequest;
 import com.igloo_club.nungil_v3.dto.QuestionListResponse;
 import com.igloo_club.nungil_v3.service.MemberService;
 import com.igloo_club.nungil_v3.service.QuestionAndAnswerService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.security.Principal;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/questions")
+@Tag(name = "QnA", description = "QnA API")
 public class QuestionAndAnswerController {
 
     private final QuestionAndAnswerService questionAndAnswerService;

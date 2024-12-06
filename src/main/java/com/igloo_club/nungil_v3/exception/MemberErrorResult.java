@@ -11,7 +11,10 @@ public enum MemberErrorResult implements ErrorResult{
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "Failed to find the User"),
     SEXLESS_USER(HttpStatus.UNPROCESSABLE_ENTITY, "User have no sex"),
     DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "Given email is already in use"),
-    ALREADY_USING(HttpStatus.BAD_REQUEST, "You are already using this email");
+    ALREADY_USING(HttpStatus.BAD_REQUEST, "You are already using this email"),
+
+    MEMBER_IMAGE_LIMIT(HttpStatus.BAD_REQUEST, "The number of images reached the limit"),
+    MEMBER_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Failed to find the profile image");
 
     private final HttpStatus httpStatus;
     private final String message;

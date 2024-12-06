@@ -71,6 +71,9 @@ public class Member {
     @JoinColumn(name = "ideal_id")
     private Ideal ideal;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberImage> memberImageList;
+
     // == 비즈니스 로직 == //
     public void createEssentialProfile(EssentialProfileCreateRequest request) {
         this.nickname = request.getNickname();
@@ -111,5 +114,8 @@ public class Member {
     public int calculateAge() {
         LocalDate currentDate = LocalDate.now();
         return Period.between(this.getBirthdate(), currentDate).getYears();
+      
+    public void addMemberImage(MemberImage memberImage) {
+        this.getMemberImageList().add(memberImage);
     }
 }

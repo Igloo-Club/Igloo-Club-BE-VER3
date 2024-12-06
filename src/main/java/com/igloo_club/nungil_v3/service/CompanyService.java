@@ -40,6 +40,8 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
 
+    private static final Duration AUTH_CODE_TTL = Duration.ofMinutes(5);
+
     public void sendAuthEmail(String email, Member member) {
 
         // 1. 사용이 불가능한 도메인인지 확인한다.
@@ -55,7 +57,7 @@ public class CompanyService {
         if (redisUtil.exists(email)) {
             redisUtil.delete(email);
         }
-        redisUtil.set(email, code, Duration.ofMinutes(5));
+        redisUtil.set(email, code, AUTH_CODE_TTL);
 
         // 5. 이메일을 발송한다.
         String subject = "[눈길] 회사 인증 메일입니다.";
@@ -223,5 +225,17 @@ public class CompanyService {
         member.updateCompany(companyWithScale);
 
         companyRepository.save(companyWithScale);
+    }
+
+    public void renewAuthEmail(String email, Member member) {
+
+        // 1. 사용이 불가능한 도메인인지 확인한다.
+        validateDomain(extractDomain(email));
+
+        // 2. 인증번호를 갱신한다.
+        String foundCode = redisUtil.getAndExpire(email, AUTH_CODE_TTL);
+        if (foundCode == null) {
+            throw new GeneralException(GlobalErrorResult.REDIS_NOT_FOUND);
+        }
     }
 }
