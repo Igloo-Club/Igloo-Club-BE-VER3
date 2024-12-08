@@ -10,6 +10,7 @@ import com.igloo_club.nungil_v3.repository.BlockedMemberRepository;
 import com.igloo_club.nungil_v3.repository.MemberRepository;
 import com.igloo_club.nungil_v3.repository.NungilRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class NungilService {
      * @return nungilResponse 추천되는 사용자 눈길 정보
      */
     @Transactional
-    public NungilResponse recommendMember(Member member){
+public NungilResponse recommendMember(Member member){
 
         // 1. 하루 제한 횟수를 초과한 경우, 예외를 발생시킨다.
         if (checkLimitExcess(member)) {
@@ -181,7 +182,7 @@ public class NungilService {
      */
     @Scheduled(cron = "0 0 11,18 * * *")
     @Transactional
-    private void resetDrawCountForAllMembers() {
+    public void resetDrawCountForAllMembers() {
         List<Member> allMembers = memberRepository.findAll();
         for (Member member : allMembers) {
             member.resetDrawCount();
@@ -198,4 +199,34 @@ public class NungilService {
         return blockedMemberRepository.findByMemberAndOpponent(member, opponent)
                 .orElse(BlockedMember.create(member, opponent, NungilStatus.RECOMMENDED));
     }
+
+
+    /**
+     * 요청 눈길 상태의 프로필을 전체 조회하는 메서드이다.
+     *
+     * @pararm pagealbe 페이지 정보
+     * @param status 요청 눈길 상태
+     *
+     * @return NungilPageResponse 슬라이스 정보 반환
+     */
+    public Slice<NungilResponse> getNungilSliceByMemberAndStatus(Member member, NungilStatus status, Pageable pageable){
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        // Nungil 엔티티를 데이터베이스에서 조회
+        Slice<Nungil> nungilSlice = nungilRepository.findAllByMemberAndStatus(pageRequest, member, status);
+
+        // Nungil 엔티티를 NungilPageResponse DTO로 변환
+        List<NungilResponse> nungilResponses = nungilSlice.getContent().stream()
+                .map(nungil -> NungilMapper.INSTANCE.toResponse(nungil))
+                .collect(Collectors.toList());
+
+        // 변환된 DTO 리스트와 함께 새로운 Slice 객체를 생성하여 반환
+        return new SliceImpl<>(nungilResponses, pageRequest, nungilSlice.hasNext());
+
+    }
+
+
+
 }

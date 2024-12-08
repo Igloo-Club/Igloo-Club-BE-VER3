@@ -12,7 +12,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-14T17:38:21+0900",
+    date = "2024-12-08T16:05:17+0900",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.12 (Microsoft)"
 )
 public class NungilMapperImpl implements NungilMapper {
