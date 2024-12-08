@@ -114,7 +114,7 @@ public class Member {
     public int calculateAge() {
         LocalDate currentDate = LocalDate.now();
         return Period.between(this.getBirthdate(), currentDate).getYears();
-      
+    }
     public void addMemberImage(MemberImage memberImage) {
         this.getMemberImageList().add(memberImage);
     }
