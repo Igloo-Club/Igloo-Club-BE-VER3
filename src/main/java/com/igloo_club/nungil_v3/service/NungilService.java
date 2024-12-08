@@ -48,10 +48,10 @@ public NungilResponse recommendMember(Member member){
             throw new GeneralException(NungilErrorResult.LIMIT_EXCEEDED);
         }
 
-        // 2. 무료 뽑기 가능한 시간대가 아닌 경우, 예외를 발생시킨다.
-        if (checkTimeOut()) {
-            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
-        }
+//        // 2. 무료 뽑기 가능한 시간대가 아닌 경우, 예외를 발생시킨다.
+//        if (checkTimeOut()) {
+//            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
+//        }
 
         // 3. 회원 한 명을 추천받는다.
         Member recommendedMember = getRecommendedMember(member);
@@ -235,8 +235,8 @@ public NungilResponse recommendMember(Member member){
      * @param nungilId 눈길 id
      */
     @Transactional
-    public void sendNungil(Member member, Long opponentId) {
-        Nungil nungil = nungilRepository.findByMember_IdAndOpponent_Id(member.getId(), opponentId)
+    public void sendNungil(Member member, Long nungilId) {
+        Nungil nungil = nungilRepository.findById(nungilId)
                 .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
         Member opponent = nungil.getOpponent();
         // 눈길 상태가 RECOMMENDED 예외 처리

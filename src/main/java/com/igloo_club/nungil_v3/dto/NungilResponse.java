@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class NungilResponse {
-    private Long id;
+    private Long nungilId;
 
     private String nickname;
 

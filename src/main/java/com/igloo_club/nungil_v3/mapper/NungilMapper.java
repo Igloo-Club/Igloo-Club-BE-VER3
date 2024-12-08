@@ -11,7 +11,7 @@ public interface NungilMapper {
     NungilMapper INSTANCE = Mappers.getMapper(NungilMapper.class);
 
     // Nungil 엔티티에서 NungilResponse로 매핑
-    @Mapping(source = "nungil.opponent.id", target = "id")
+    @Mapping(source = "nungil.id", target = "nungilId")
     @Mapping(source = "nungil.opponent.nickname", target = "nickname")
     @Mapping(source = "nungil.opponent.birthdate", target = "birthdate")
     @Mapping(source = "nungil.opponent.company.companyName", target = "companyName")

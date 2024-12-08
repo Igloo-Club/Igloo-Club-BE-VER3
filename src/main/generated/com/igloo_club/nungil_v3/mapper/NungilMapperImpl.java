@@ -12,7 +12,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-08T18:30:39+0900",
+    date = "2024-12-08T18:44:51+0900",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.12 (Microsoft)"
 )
 public class NungilMapperImpl implements NungilMapper {
@@ -23,7 +23,7 @@ public class NungilMapperImpl implements NungilMapper {
             return null;
         }
 
-        Long id = null;
+        Long nungilId = null;
         String nickname = null;
         LocalDate birthdate = null;
         String companyName = null;
@@ -34,7 +34,7 @@ public class NungilMapperImpl implements NungilMapper {
         Integer marriagePlan = null;
         MbtiType mbtiType = null;
 
-        id = nungilOpponentId( nungil );
+        nungilId = nungil.getId();
         nickname = nungilOpponentNickname( nungil );
         birthdate = nungilOpponentBirthdate( nungil );
         companyName = nungilOpponentCompanyCompanyName( nungil );
@@ -45,24 +45,9 @@ public class NungilMapperImpl implements NungilMapper {
         marriagePlan = nungilOpponentProfileMarriagePlan( nungil );
         mbtiType = nungilOpponentProfileMbtiType( nungil );
 
-        NungilResponse nungilResponse = new NungilResponse( id, nickname, birthdate, companyName, height, religion, tattoo, smoke, marriagePlan, mbtiType );
+        NungilResponse nungilResponse = new NungilResponse( nungilId, nickname, birthdate, companyName, height, religion, tattoo, smoke, marriagePlan, mbtiType );
 
         return nungilResponse;
-    }
-
-    private Long nungilOpponentId(Nungil nungil) {
-        if ( nungil == null ) {
-            return null;
-        }
-        Member opponent = nungil.getOpponent();
-        if ( opponent == null ) {
-            return null;
-        }
-        Long id = opponent.getId();
-        if ( id == null ) {
-            return null;
-        }
-        return id;
     }
 
     private String nungilOpponentNickname(Nungil nungil) {

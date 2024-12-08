@@ -40,9 +40,9 @@ public class NungilController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<?> sendNungil(Principal principal, @RequestParam Long id){
+    public ResponseEntity<?> sendNungil(Principal principal, @RequestParam Long nungilId){
         Member member = getMember(principal);
-        nungilService.sendNungil(member, id);
+        nungilService.sendNungil(member, nungilId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
