@@ -45,6 +45,9 @@ public class Nungil {
         this.status = status;
     }
 
+    public void setExpiredAtDaysAfter(int expireDuration){
+        this.expiredAt = LocalDateTime.now().plusDays(expireDuration);
+    }
 
 
 }

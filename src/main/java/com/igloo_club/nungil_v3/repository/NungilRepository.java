@@ -7,7 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface NungilRepository extends JpaRepository<Nungil, Long> {
     Slice<Nungil> findAllByMemberAndStatus(PageRequest request, Member member, NungilStatus status);
-
+    List<Nungil> findAllByMemberAndOpponentAndStatus(Member member, Member receiver, NungilStatus status);
+    Optional<Nungil> findByMember_IdAndOpponent_Id(long memberId, long opponentId);
 }

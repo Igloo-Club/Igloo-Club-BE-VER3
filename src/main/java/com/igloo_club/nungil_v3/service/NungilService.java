@@ -227,6 +227,45 @@ public NungilResponse recommendMember(Member member){
 
     }
 
+    /**
+     * 눈길을 보내는 api입니다
+     * member에게 recommend status의 눈길을 SENT로 수정하며
+     * opponent에게 status가 RECEIVED인 눈길을 생성합니다
+     *
+     * @param nungilId 눈길 id
+     */
+    @Transactional
+    public void sendNungil(Member member, Long opponentId) {
+        Nungil nungil = nungilRepository.findByMember_IdAndOpponent_Id(member.getId(), opponentId)
+                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        Member opponent = nungil.getOpponent();
+        // 눈길 상태가 RECOMMENDED 예외 처리
+        if (!nungil.getStatus().equals(NungilStatus.RECOMMENDED)) {
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
+        }
 
+        // BlockedMember에 각각 추가
+        BlockedMember memberAcquaintance = getBlockedMember(member, opponent);
+        BlockedMember opponentAcquaintance = getBlockedMember(opponent, member);
+
+
+        // 이미 눈길을 전송했을 시 예외 처리
+        List<Nungil> opponentNungilList = nungilRepository.findAllByMemberAndOpponentAndStatus(opponent, member, NungilStatus.RECEIVED);
+        if (opponentNungilList.size() > 0) {
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
+        }
+
+        // member의 눈길 상태를 SENT, 만료일을 3일 뒤로 설정
+        nungil.setStatus(NungilStatus.SENT);
+        nungil.setExpiredAtDaysAfter(3);
+        memberAcquaintance.update(NungilStatus.SENT, 7);
+
+        // opponent의 눈길 생성 및 저장, 만료일을 3일 뒤로 설정
+        Nungil newNungil = Nungil.create(opponent, member, NungilStatus.RECEIVED);
+        newNungil.setExpiredAtDaysAfter(3);
+        opponentAcquaintance.update(NungilStatus.RECEIVED, 7);
+        blockedMemberRepository.save(opponentAcquaintance);
+        nungilRepository.save(newNungil);
+    }
 
 }

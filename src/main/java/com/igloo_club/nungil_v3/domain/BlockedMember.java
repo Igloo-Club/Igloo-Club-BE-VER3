@@ -56,4 +56,11 @@ public class BlockedMember {
 
         return blockedMember;
     }
+
+    public void update(NungilStatus status, int expireDuration) {
+        this.status = status;
+        this.sentAt = LocalDateTime.now();
+        this.expiredAt = this.sentAt.plusDays(expireDuration);
+    }
+
 }

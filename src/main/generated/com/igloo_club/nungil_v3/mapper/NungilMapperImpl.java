@@ -12,7 +12,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-12-08T16:05:17+0900",
+    date = "2024-12-08T18:30:39+0900",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 11.0.12 (Microsoft)"
 )
 public class NungilMapperImpl implements NungilMapper {
@@ -34,76 +34,76 @@ public class NungilMapperImpl implements NungilMapper {
         Integer marriagePlan = null;
         MbtiType mbtiType = null;
 
-        id = nungilMemberId( nungil );
-        nickname = nungilMemberNickname( nungil );
-        birthdate = nungilMemberBirthdate( nungil );
-        companyName = nungilMemberCompanyCompanyName( nungil );
-        height = nungilMemberProfileHeight( nungil );
-        religion = nungilMemberProfileReligion( nungil );
-        tattoo = nungilMemberProfileTattoo( nungil );
-        smoke = nungilMemberProfileSmoke( nungil );
-        marriagePlan = nungilMemberProfileMarriagePlan( nungil );
-        mbtiType = nungilMemberProfileMbtiType( nungil );
+        id = nungilOpponentId( nungil );
+        nickname = nungilOpponentNickname( nungil );
+        birthdate = nungilOpponentBirthdate( nungil );
+        companyName = nungilOpponentCompanyCompanyName( nungil );
+        height = nungilOpponentProfileHeight( nungil );
+        religion = nungilOpponentProfileReligion( nungil );
+        tattoo = nungilOpponentProfileTattoo( nungil );
+        smoke = nungilOpponentProfileSmoke( nungil );
+        marriagePlan = nungilOpponentProfileMarriagePlan( nungil );
+        mbtiType = nungilOpponentProfileMbtiType( nungil );
 
         NungilResponse nungilResponse = new NungilResponse( id, nickname, birthdate, companyName, height, religion, tattoo, smoke, marriagePlan, mbtiType );
 
         return nungilResponse;
     }
 
-    private Long nungilMemberId(Nungil nungil) {
+    private Long nungilOpponentId(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Long id = member.getId();
+        Long id = opponent.getId();
         if ( id == null ) {
             return null;
         }
         return id;
     }
 
-    private String nungilMemberNickname(Nungil nungil) {
+    private String nungilOpponentNickname(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        String nickname = member.getNickname();
+        String nickname = opponent.getNickname();
         if ( nickname == null ) {
             return null;
         }
         return nickname;
     }
 
-    private LocalDate nungilMemberBirthdate(Nungil nungil) {
+    private LocalDate nungilOpponentBirthdate(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        LocalDate birthdate = member.getBirthdate();
+        LocalDate birthdate = opponent.getBirthdate();
         if ( birthdate == null ) {
             return null;
         }
         return birthdate;
     }
 
-    private String nungilMemberCompanyCompanyName(Nungil nungil) {
+    private String nungilOpponentCompanyCompanyName(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Company company = member.getCompany();
+        Company company = opponent.getCompany();
         if ( company == null ) {
             return null;
         }
@@ -114,15 +114,15 @@ public class NungilMapperImpl implements NungilMapper {
         return companyName;
     }
 
-    private Integer nungilMemberProfileHeight(Nungil nungil) {
+    private Integer nungilOpponentProfileHeight(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Profile profile = member.getProfile();
+        Profile profile = opponent.getProfile();
         if ( profile == null ) {
             return null;
         }
@@ -133,15 +133,15 @@ public class NungilMapperImpl implements NungilMapper {
         return height;
     }
 
-    private Religion nungilMemberProfileReligion(Nungil nungil) {
+    private Religion nungilOpponentProfileReligion(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Profile profile = member.getProfile();
+        Profile profile = opponent.getProfile();
         if ( profile == null ) {
             return null;
         }
@@ -152,15 +152,15 @@ public class NungilMapperImpl implements NungilMapper {
         return religion;
     }
 
-    private Boolean nungilMemberProfileTattoo(Nungil nungil) {
+    private Boolean nungilOpponentProfileTattoo(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Profile profile = member.getProfile();
+        Profile profile = opponent.getProfile();
         if ( profile == null ) {
             return null;
         }
@@ -171,15 +171,15 @@ public class NungilMapperImpl implements NungilMapper {
         return tattoo;
     }
 
-    private Boolean nungilMemberProfileSmoke(Nungil nungil) {
+    private Boolean nungilOpponentProfileSmoke(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Profile profile = member.getProfile();
+        Profile profile = opponent.getProfile();
         if ( profile == null ) {
             return null;
         }
@@ -190,15 +190,15 @@ public class NungilMapperImpl implements NungilMapper {
         return smoke;
     }
 
-    private Integer nungilMemberProfileMarriagePlan(Nungil nungil) {
+    private Integer nungilOpponentProfileMarriagePlan(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Profile profile = member.getProfile();
+        Profile profile = opponent.getProfile();
         if ( profile == null ) {
             return null;
         }
@@ -209,15 +209,15 @@ public class NungilMapperImpl implements NungilMapper {
         return marriagePlan;
     }
 
-    private MbtiType nungilMemberProfileMbtiType(Nungil nungil) {
+    private MbtiType nungilOpponentProfileMbtiType(Nungil nungil) {
         if ( nungil == null ) {
             return null;
         }
-        Member member = nungil.getMember();
-        if ( member == null ) {
+        Member opponent = nungil.getOpponent();
+        if ( opponent == null ) {
             return null;
         }
-        Profile profile = member.getProfile();
+        Profile profile = opponent.getProfile();
         if ( profile == null ) {
             return null;
         }

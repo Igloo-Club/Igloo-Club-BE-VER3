@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,14 @@ public class NungilController {
 
         return ResponseEntity.ok(nungilPageResponses);
     }
+
+    @PostMapping("/send")
+    public ResponseEntity<?> sendNungil(Principal principal, @RequestParam Long id){
+        Member member = getMember(principal);
+        nungilService.sendNungil(member, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
 
     private Member getMember(Principal principal) {
