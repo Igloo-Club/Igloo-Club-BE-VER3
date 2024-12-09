@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
+import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
 import com.igloo_club.nungil_v3.dto.NungilResponse;
 import com.igloo_club.nungil_v3.service.MemberService;
 import com.igloo_club.nungil_v3.service.NungilService;
@@ -44,6 +45,12 @@ public class NungilController {
         Member member = getMember(principal);
         nungilService.sendNungil(member, nungilId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<NungilDetailResponse> getNungilDetail(Principal principal, @RequestParam Long nungilId){
+        NungilDetailResponse nungilDetailResponse = nungilService.getNungilDetail(nungilId);
+        return ResponseEntity.ok(nungilDetailResponse);
     }
 
 

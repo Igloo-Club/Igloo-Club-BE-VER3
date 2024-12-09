@@ -2,7 +2,9 @@ package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
+import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
 import com.igloo_club.nungil_v3.dto.NungilResponse;
+import com.igloo_club.nungil_v3.dto.QuestionAndAnswerResponse;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.NungilErrorResult;
 import com.igloo_club.nungil_v3.repository.BlockedMemberRepository;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class NungilService {
     private final PresignedUrlService presignedUrlService;
+
+    private final QuestionAndAnswerService questionAndAnswerService;
 
     private final MemberRepository memberRepository;
 
@@ -72,7 +76,8 @@ public NungilResponse recommendMember(Member member){
         member.plusDrawCount();
 
         // 7. 추천 받은 회원 정보를 반환한다.
-        return NungilResponse.create(newNungil, presignedUrlService);
+        List<String> imageUrlList = getImageUrlList(recommendedMember);
+        return NungilResponse.create(newNungil, imageUrlList);
     }
 
     private Member getRecommendedMember(Member currentMember) {
@@ -220,7 +225,7 @@ public NungilResponse recommendMember(Member member){
         // Nungil 엔티티를 NungilPageResponse DTO로 변환
 
         List<NungilResponse> nungilResponses = nungilSlice.getContent().stream()
-                .map(nungil -> NungilResponse.create(nungil,presignedUrlService))
+                .map(nungil -> NungilResponse.create(nungil,getImageUrlList(nungil.getOpponent())))
                 .collect(Collectors.toList());
 
         // 변환된 DTO 리스트와 함께 새로운 Slice 객체를 생성하여 반환
@@ -266,5 +271,29 @@ public NungilResponse recommendMember(Member member){
         opponentAcquaintance.update(NungilStatus.RECEIVED, 7);
         blockedMemberRepository.save(opponentAcquaintance);
         nungilRepository.save(newNungil);
+    }
+
+    /**
+     * 특정 눈길 정보를 조회하는 api입니다
+     *
+     * @param nungilId 눈길 id
+     * @return nungilDetailResponse 특정 눈길 상세 정보
+     */
+    public NungilDetailResponse getNungilDetail(Long nungilId){
+        Nungil nungil = nungilRepository.findById(nungilId)
+                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        List<QuestionAndAnswerResponse> qaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getOpponent(), 0, 3).toList();
+        List<QuestionAndAnswerResponse> myQaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getMember(), 0, 3).toList();
+        int myAnsweredQa = myQaList.size();
+        NungilDetailResponse response = NungilDetailResponse.create(nungil, qaList,myAnsweredQa, getImageUrlList(nungil.getOpponent()));
+        return response;
+    }
+
+    private List<String> getImageUrlList(Member member){
+        List<String> imageUrlList = member.getMemberImageList().stream()
+                .map(MemberImage::getFilename)
+                .map(filename -> presignedUrlService.generatePresignedDownloadUrl(filename.toString()))
+                .collect(Collectors.toList());
+        return imageUrlList;
     }
 }
