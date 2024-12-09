@@ -5,7 +5,6 @@ import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
 import com.igloo_club.nungil_v3.dto.NungilResponse;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.NungilErrorResult;
-import com.igloo_club.nungil_v3.mapper.NungilMapper;
 import com.igloo_club.nungil_v3.repository.BlockedMemberRepository;
 import com.igloo_club.nungil_v3.repository.MemberRepository;
 import com.igloo_club.nungil_v3.repository.NungilRepository;
@@ -26,10 +25,12 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class NungilService {
-    private final MemberService memberService;
+    private final PresignedUrlService presignedUrlService;
 
     private final MemberRepository memberRepository;
+
     private final BlockedMemberRepository blockedMemberRepository;
+
     private final NungilRepository nungilRepository;
 
     private static final Long RECOMMENDATION_LIMIT = 1L;
@@ -70,9 +71,8 @@ public NungilResponse recommendMember(Member member){
         // 6. 추천이 정상적으로 동작했을 시 drawCount를 1 증가 시킨다.
         member.plusDrawCount();
 
-        // 7. 추천 받은 회원 정보를 반환한다. -> mapper 수정하기
-        return NungilMapper.INSTANCE.toResponse(newNungil);
-        // + 시간 초과 시 drawCount 초기화
+        // 7. 추천 받은 회원 정보를 반환한다.
+        return NungilResponse.create(newNungil, presignedUrlService);
     }
 
     private Member getRecommendedMember(Member currentMember) {
@@ -218,13 +218,13 @@ public NungilResponse recommendMember(Member member){
         Slice<Nungil> nungilSlice = nungilRepository.findAllByMemberAndStatus(pageRequest, member, status);
 
         // Nungil 엔티티를 NungilPageResponse DTO로 변환
+
         List<NungilResponse> nungilResponses = nungilSlice.getContent().stream()
-                .map(nungil -> NungilMapper.INSTANCE.toResponse(nungil))
+                .map(nungil -> NungilResponse.create(nungil,presignedUrlService))
                 .collect(Collectors.toList());
 
         // 변환된 DTO 리스트와 함께 새로운 Slice 객체를 생성하여 반환
         return new SliceImpl<>(nungilResponses, pageRequest, nungilSlice.hasNext());
-
     }
 
     /**
@@ -252,7 +252,7 @@ public NungilResponse recommendMember(Member member){
         // 이미 눈길을 전송했을 시 예외 처리
         List<Nungil> opponentNungilList = nungilRepository.findAllByMemberAndOpponentAndStatus(opponent, member, NungilStatus.RECEIVED);
         if (opponentNungilList.size() > 0) {
-            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
+            throw new GeneralException(NungilErrorResult.NUNGIL_ALREADY_SENT);
         }
 
         // member의 눈길 상태를 SENT, 만료일을 3일 뒤로 설정
@@ -267,5 +267,4 @@ public NungilResponse recommendMember(Member member){
         blockedMemberRepository.save(opponentAcquaintance);
         nungilRepository.save(newNungil);
     }
-
 }

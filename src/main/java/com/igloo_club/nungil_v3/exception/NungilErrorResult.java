@@ -12,7 +12,7 @@ public enum NungilErrorResult implements ErrorResult{
     NO_RECOMMENDATION(HttpStatus.NO_CONTENT, "No one has been recommended."),
     NUNGIL_NOT_FOUND(HttpStatus.NOT_FOUND, "Failed to find the Nungil"),
     NUNGIL_WRONG_STATUS(HttpStatus.BAD_REQUEST, "Nungil's status is not correct"),
-
+    NUNGIL_ALREADY_SENT(HttpStatus.BAD_REQUEST, "Nungil is already sent"),
     ;
 
     private final HttpStatus httpStatus;
