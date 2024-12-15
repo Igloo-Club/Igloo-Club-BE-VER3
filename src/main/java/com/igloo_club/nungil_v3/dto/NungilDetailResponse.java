@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,7 +50,7 @@ public class NungilDetailResponse {
 
     private MbtiType mbtiType;
 
-    private List<Hobby> hobbyList;
+    private List<String> hobbyNameList;
 
     // 1문 1답
     private Integer myAnsweredQa;
@@ -77,7 +78,7 @@ public class NungilDetailResponse {
         response.smoke = opponentProfile.getSmoke();
         response.marriagePlan = opponentProfile.getMarriagePlan();
         response.mbtiType = opponentProfile.getMbtiType();
-        response.hobbyList = opponentProfile.getHobbyList();
+        response.hobbyNameList = opponentProfile.getHobbyList().stream().map(Hobby::getName).map(HobbyName::getName) .collect(Collectors.toList());
         response.questionAndAnswerList = qaList;
         response.myAnsweredQa = myAnsweredQa;
 
