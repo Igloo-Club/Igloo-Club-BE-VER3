@@ -53,10 +53,10 @@ public NungilResponse recommendMember(Member member){
             throw new GeneralException(NungilErrorResult.LIMIT_EXCEEDED);
         }
 
-//        // 2. 무료 뽑기 가능한 시간대가 아닌 경우, 예외를 발생시킨다.
-//        if (checkTimeOut()) {
-//            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
-//        }
+        // 2. 무료 뽑기 가능한 시간대가 아닌 경우, 예외를 발생시킨다.
+        if (checkTimeOut()) {
+            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
+        }
 
         // 3. 회원 한 명을 추천받는다.
         Member recommendedMember = getRecommendedMember(member);
@@ -280,13 +280,15 @@ public NungilResponse recommendMember(Member member){
      * @return nungilDetailResponse 특정 눈길 상세 정보
      */
     public NungilDetailResponse getNungilDetail(Long nungilId){
-        Nungil nungil = nungilRepository.findById(nungilId)
-                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
-        List<QuestionAndAnswerResponse> qaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getOpponent(), 0, 3).toList();
-        List<QuestionAndAnswerResponse> myQaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getMember(), 0, 3).toList();
-        int myAnsweredQa = myQaList.size();
-        NungilDetailResponse response = NungilDetailResponse.create(nungil, qaList,myAnsweredQa, getImageUrlList(nungil.getOpponent()));
-        return response;
+//        Nungil nungil = nungilRepository.findById(nungilId)
+//                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+//        List<QuestionAndAnswerResponse> qaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getOpponent(), 0, 3).toList();
+//        List<QuestionAndAnswerResponse> myQaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getMember(), 0, 3).toList();
+//        int myAnsweredQa = myQaList.size();
+//        NungilDetailResponse response = NungilDetailResponse.create(nungil, qaList,myAnsweredQa, getImageUrlList(nungil.getOpponent()));
+//        return response;
+        return nungilRepository.findFullNungilDetailNative(nungilId)
+                .orElseThrow(()->new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
     }
 
     private List<String> getImageUrlList(Member member){
