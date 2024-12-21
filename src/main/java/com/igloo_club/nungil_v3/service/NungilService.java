@@ -280,15 +280,14 @@ public NungilResponse recommendMember(Member member){
      * @return nungilDetailResponse 특정 눈길 상세 정보
      */
     public NungilDetailResponse getNungilDetail(Long nungilId){
-//        Nungil nungil = nungilRepository.findById(nungilId)
-//                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
-//        List<QuestionAndAnswerResponse> qaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getOpponent(), 0, 3).toList();
-//        List<QuestionAndAnswerResponse> myQaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getMember(), 0, 3).toList();
-//        int myAnsweredQa = myQaList.size();
-//        NungilDetailResponse response = NungilDetailResponse.create(nungil, qaList,myAnsweredQa, getImageUrlList(nungil.getOpponent()));
-//        return response;
-        return nungilRepository.findFullNungilDetailNative(nungilId)
-                .orElseThrow(()->new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        Nungil nungil = nungilRepository.findById(nungilId)
+                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        PageRequest pageRequest = PageRequest.of(0, 3);
+        List<QuestionAndAnswerResponse> qaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getOpponent(), pageRequest).toList();
+        List<QuestionAndAnswerResponse> myQaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getMember(), pageRequest).toList();
+        int myAnsweredQa = myQaList.size();
+        NungilDetailResponse response = NungilDetailResponse.create(nungil, qaList,myAnsweredQa, getImageUrlList(nungil.getOpponent()));
+        return response;
     }
 
     private List<String> getImageUrlList(Member member){
