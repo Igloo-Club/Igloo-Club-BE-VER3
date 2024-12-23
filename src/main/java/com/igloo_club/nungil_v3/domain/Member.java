@@ -3,6 +3,10 @@ package com.igloo_club.nungil_v3.domain;
 import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
 import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
+import com.igloo_club.nungil_v3.dto.IdealResponse;
+import com.igloo_club.nungil_v3.exception.GeneralException;
+import com.igloo_club.nungil_v3.exception.IdealErrorResult;
+import com.igloo_club.nungil_v3.exception.MemberErrorResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +57,9 @@ public class Member {
     @Builder.Default
     private boolean agreeMarketing = true;
 
+    @Column(columnDefinition = "VARCHAR(255)")
+    private String job;
+
     @Builder.Default
     private LocalDate createdAt = LocalDate.now();
 
@@ -63,11 +71,15 @@ public class Member {
     @JoinColumn(name = "ideal_id")
     private Ideal ideal;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberImage> memberImageList;
+
     // == 비즈니스 로직 == //
     public void createEssentialProfile(EssentialProfileCreateRequest request) {
         this.nickname = request.getNickname();
         this.sex = request.getSex();
         this.birthdate = request.getBirthdate();
+        this.job = request.getJob();
     }
 
     public void createAdditionalProfile(Profile profile) {
@@ -88,4 +100,22 @@ public class Member {
         this.location.add(location);
     }
 
+    public void resetDrawCount(){
+        this.drawCount = 0L;
+    }
+
+    public void plusDrawCount() {this.drawCount += 1L;}
+
+    public Sex getOppositeSex(){
+        if (this.getSex().equals(Sex.FEMALE)){return Sex.MALE;}
+        if (this.getSex().equals(Sex.MALE)){return Sex.FEMALE;}
+        throw new GeneralException(MemberErrorResult.SEXLESS_USER);
+    }
+    public int calculateAge() {
+        LocalDate currentDate = LocalDate.now();
+        return Period.between(this.getBirthdate(), currentDate).getYears();
+      
+    public void addMemberImage(MemberImage memberImage) {
+        this.getMemberImageList().add(memberImage);
+    }
 }

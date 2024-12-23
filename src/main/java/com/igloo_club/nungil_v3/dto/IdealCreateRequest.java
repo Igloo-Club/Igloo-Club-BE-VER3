@@ -3,7 +3,6 @@ package com.igloo_club.nungil_v3.dto;
 import com.igloo_club.nungil_v3.domain.Ideal;
 import com.igloo_club.nungil_v3.domain.enums.MbtiElem;
 import com.igloo_club.nungil_v3.domain.enums.MbtiType;
-import com.igloo_club.nungil_v3.domain.enums.Preference;
 import com.igloo_club.nungil_v3.domain.enums.Religion;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.IdealErrorResult;
@@ -13,7 +12,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +29,7 @@ public class IdealCreateRequest {
 
     private List<MbtiElem> mbtiElemList = new ArrayList<>();
 
-    private Preference smoke;
+    private Boolean smoke;
 
     private Religion religion;
 

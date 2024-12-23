@@ -17,8 +17,14 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 
 @Configuration
-@SecurityScheme(type = SecuritySchemeType.APIKEY, name = "Access-Token", in = SecuritySchemeIn.HEADER)
-@OpenAPIDefinition(security = { @SecurityRequirement(name = "Access-Token") })
+@SecurityScheme(
+        name = "Bearer Authentication",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",  // JWT 형식으로 명시
+        in = SecuritySchemeIn.HEADER
+)
+@OpenAPIDefinition(security = { @SecurityRequirement(name = "Bearer Authentication") })
 public class SwaggerConfig {
     @Bean
     public GroupedOpenApi publicApi() {
