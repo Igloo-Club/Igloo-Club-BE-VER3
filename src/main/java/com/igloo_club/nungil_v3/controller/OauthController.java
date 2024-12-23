@@ -35,7 +35,7 @@ public class OauthController {
     public ResponseEntity<LoginResponse> kakaoLogin(
             @RequestBody
             OauthLoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        LoginResponse loginResponse = oauthService.kakaoLogin(loginRequest.getCode(), request, response);
+        LoginResponse loginResponse = oauthService.kakaoLogin(loginRequest.getCode(), loginRequest.getFcmToken(), request, response);
         return ResponseEntity.ok(loginResponse);
     }
 
