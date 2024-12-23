@@ -1,10 +1,7 @@
 package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
-import com.igloo_club.nungil_v3.dto.ChatMessageResponse;
-import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
-import com.igloo_club.nungil_v3.dto.ChatRoomDetailResponse;
-import com.igloo_club.nungil_v3.dto.ChatRoomListResponse;
+import com.igloo_club.nungil_v3.dto.*;
 import com.igloo_club.nungil_v3.exception.ChatMessageErrorResult;
 import com.igloo_club.nungil_v3.exception.ChatRoomErrorResult;
 import com.igloo_club.nungil_v3.exception.GeneralException;
@@ -38,6 +35,8 @@ public class ChatMessageService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
 
+    private final FCMService fcmService;
+
     private final SetRedisUtil redisUtil;
 
     /**
@@ -70,6 +69,13 @@ public class ChatMessageService {
         if (isMemberOnline(chatRoom.getId(), opponent.getId())) {
             chatMessage.setStatusAsRead();
             chatMessageRepository.save(chatMessage);
+        } else {
+            FCMSendDTO fcmSendDTO = FCMSendDTO.builder().title("눈길").body(chatMessage.getContent()).build();
+            try {
+                fcmService.sendMessageTo(fcmSendDTO, opponent);
+            } catch (Exception e) {
+                // do nothing
+            }
         }
 
         return ChatDTO.of(chatDTO.getChatRoomId(), member, chatMessage);
