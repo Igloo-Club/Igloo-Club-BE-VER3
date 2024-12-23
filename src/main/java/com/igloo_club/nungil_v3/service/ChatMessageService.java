@@ -35,7 +35,7 @@ public class ChatMessageService {
 
     private final MemberChatRoomRepository memberChatRoomRepository;
 
-    private final FCMService fcmService;
+    private final FcmEventService fcmEventService;
 
     private final SetRedisUtil redisUtil;
 
@@ -70,12 +70,7 @@ public class ChatMessageService {
             chatMessage.setStatusAsRead();
             chatMessageRepository.save(chatMessage);
         } else {
-            FCMSendDTO fcmSendDTO = FCMSendDTO.builder().title("눈길").body(chatMessage.getContent()).build();
-            try {
-                fcmService.sendMessageTo(fcmSendDTO, opponent);
-            } catch (Exception e) {
-                // do nothing
-            }
+            fcmEventService.sendMessageTo("눈길", chatMessage.getContent(), opponent);
         }
 
         return ChatDTO.of(chatDTO.getChatRoomId(), member, chatMessage);
