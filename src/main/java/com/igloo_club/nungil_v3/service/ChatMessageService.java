@@ -166,7 +166,9 @@ public class ChatMessageService {
             String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
             ChatMessage lastMessage = chatMessageRepository.findTop1LastMessage(chatRoom, PageRequest.of(0, 1));
 
-            return ChatRoomListResponse.create(chatRoom, lastMessage, opponent, imageUrl);
+            int unreadCnt = chatMessageRepository.findUnreadByChatRoomAndMember(chatRoom, opponent).size();
+
+            return ChatRoomListResponse.create(chatRoom, lastMessage, opponent, imageUrl, unreadCnt);
         });
     }
 

@@ -23,7 +23,9 @@ public class ChatRoomListResponse {
 
     private Long chatRoomId;
 
-    public static ChatRoomListResponse create(ChatRoom chatRoom, ChatMessage lastMessage, Member opponent, String imageUrl) {
+    private int unreadCnt = 0;
+
+    public static ChatRoomListResponse create(ChatRoom chatRoom, ChatMessage lastMessage, Member opponent, String imageUrl, int unreadCnt) {
 
         ChatRoomListResponse response = new ChatRoomListResponse();
 
@@ -32,6 +34,7 @@ public class ChatRoomListResponse {
         response.createdAt = chatRoom.getLastMessageAt();
         response.imageUrl = imageUrl;
         response.chatRoomId = chatRoom.getId();
+        response.unreadCnt = unreadCnt;
 
         if (lastMessage != null) {
             response.content = lastMessage.getContent();

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
@@ -20,6 +21,9 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     ChatMessage findTop1LastMessage(@Param("chatRoom") ChatRoom chatRoom, PageRequest pageRequest);
 
     Optional<ChatMessage> findTop1ByIdAndChatRoom(Long id, ChatRoom chatRoom);
+
+    @Query("SELECT cm FROM ChatMessage cm WHERE cm.chatRoom = :chatRoom AND cm.member = :member AND cm.status = 'UNREAD'")
+    List<ChatMessage> findUnreadByChatRoomAndMember(@Param("chatRoom") ChatRoom chatRoom, @Param("member") Member member);
 
     @Query("DELETE FROM ChatMessage cm WHERE cm.chatRoom = :chatRoom")
     @Modifying
