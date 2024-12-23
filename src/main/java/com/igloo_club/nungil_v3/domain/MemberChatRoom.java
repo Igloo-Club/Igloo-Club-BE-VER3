@@ -50,6 +50,10 @@ public class MemberChatRoom {
         this.isDeleted = true;
     }
 
+    public void setAsActive() {
+        this.isDeleted = false;
+    }
+
     public void removeMember() {
         this.member.getMemberChatRoomList().remove(this);
         this.member = null;

@@ -28,6 +28,7 @@ public class ChatMessage {
     private Member member;
 
     @Column(length = 400)
+    @Getter(AccessLevel.NONE)
     private String content;
 
     // 개발의 편의를 위해 일단 기본값을 READ로 설정. 추후 읽지 않은 메시지 개발 시 UNREAD로 변경
@@ -36,6 +37,13 @@ public class ChatMessage {
     private ChatMessageStatus status = ChatMessageStatus.UNREAD;
 
     private LocalDateTime createdAt;
+
+    public String getContent() {
+        if (ChatMessageStatus.DELETED.equals(this.status)) {
+            return "삭제된 메시지입니다.";
+        }
+        return this.content;
+    }
 
     public static ChatMessage create(ChatRoom chatRoom, Member member, String content) {
         ChatMessage chatMessage = new ChatMessage();

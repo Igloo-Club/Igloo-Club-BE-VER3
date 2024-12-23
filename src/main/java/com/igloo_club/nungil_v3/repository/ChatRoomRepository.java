@@ -15,8 +15,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long>, Pagin
 
     @Query("SELECT DISTINCT cr FROM ChatRoom cr " +
             "JOIN cr.memberChatRoomList mcr " +
-            "WHERE (cr.sender = :sender OR cr.receiver = :receiver) AND mcr.isDeleted = false")
-    Slice<ChatRoom> findActiveChatRoomByMember(@Param("sender") Member sender, @Param("receiver") Member receiver, Pageable pageable);
+            "WHERE (cr.sender = :member OR cr.receiver = :member) AND mcr.isDeleted = false")
+    Slice<ChatRoom> findActiveChatRoomByMember(@Param("member") Member member, Pageable pageable);
 
     @Query("SELECT cr FROM ChatRoom cr " +
             "WHERE (cr.sender = :member1 AND cr.receiver = :member2) " +

@@ -159,7 +159,7 @@ public class ChatMessageService {
      * @return Slice 형식의 채팅 메시지 목록
      */
     public Slice<ChatRoomListResponse> getChatRoomSlice(Member member, PageRequest pageRequest){
-        Slice<ChatRoom> chatRoomSlice = chatRoomRepository.findActiveChatRoomByMember(member, member, pageRequest);
+        Slice<ChatRoom> chatRoomSlice = chatRoomRepository.findActiveChatRoomByMember(member, pageRequest);
 
         return chatRoomSlice.map(chatRoom -> {
             Member opponent = chatRoom.getOpponent(member.getId());
@@ -263,6 +263,9 @@ public class ChatMessageService {
     public void createMemberChatRoomIfNotExist(Member member, ChatRoom chatRoom) {
         MemberChatRoom memberChatRoom = memberChatRoomRepository.findByMemberAndChatRoom(member, chatRoom)
                 .orElse(MemberChatRoom.create(member, chatRoom));
+        if (memberChatRoom.isDeleted()) {
+            memberChatRoom.setAsActive();
+        }
         memberChatRoomRepository.save(memberChatRoom);
     }
 }
