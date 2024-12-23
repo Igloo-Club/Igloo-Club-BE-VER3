@@ -181,7 +181,7 @@ public class NungilService {
      */
     @Scheduled(cron = "0 0 11,18 * * *")
     @Transactional
-    private void resetDrawCountForAllMembers() {
+    public void resetDrawCountForAllMembers() {
         List<Member> allMembers = memberRepository.findAll();
         for (Member member : allMembers) {
             member.resetDrawCount();
