@@ -5,5 +5,6 @@ public enum NungilStatus {
     SENT,
     MATCHED,
     RECOMMENDED,
-    ACCEPTED,
+    ACCEPTED_SENT,
+    ACCEPTED_RECEIVED,
 }
