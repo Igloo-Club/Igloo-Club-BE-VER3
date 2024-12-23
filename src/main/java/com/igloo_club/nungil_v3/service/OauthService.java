@@ -72,15 +72,15 @@ public class OauthService {
 
 
     @Transactional
-    public LoginResponse kakaoLogin(String code, HttpServletRequest request, HttpServletResponse response) {
+    public LoginResponse kakaoLogin(String code, String fcmToken, HttpServletRequest request, HttpServletResponse response) {
         // 1. 인가 코드로 OAuth2 액세스 토큰 요청
         String oauthAccessToken = getAccessToken(code);
 
         // 2. OAuth2 액세스 토큰으로 회원 정보 요청
         JsonNode responseJson = getKakaoUserInfo(oauthAccessToken);
 
-        // 3. 회원 정보 저장
-        Member member = registerKakaoUser(responseJson, oauthAccessToken);
+        // 3. 회원 정보 및 FCM 토큰 저장
+        Member member = registerKakaoUser(responseJson, oauthAccessToken, fcmToken);
 
         // 3-1. 회원 프로필 등록 여부 판별
         RegisterProgress nextProgress = getNextProgress(member);
@@ -144,6 +144,9 @@ public class OauthService {
 
         // 3. 카카오로 로그아웃 요청 보내기
         logoutKakao(oauthAccessToken);
+
+        // 4. 유저의 FCM 토큰 삭제
+        oauth.deleteFCMToken();
     }
 
     private void addRefreshTokenToCookie(HttpServletRequest request, HttpServletResponse response, String refreshToken) {
@@ -241,14 +244,15 @@ public class OauthService {
      * @param responseJson JSON 형식의 카카오 회원 정보
      * @return 저장된 Member 객체
      */
-    private Member registerKakaoUser(JsonNode responseJson, String oauthAccess) {
+    private Member registerKakaoUser(JsonNode responseJson, String oauthAccess, String fcmToken) {
         String oauthId = responseJson.get("id").asText();
 
         Oauth oauth = oauthRepository.findByOauthId(oauthId)
-                .map(entity -> entity.update(oauthAccess))
+                .map(entity -> entity.update(oauthAccess, fcmToken))
                 .orElse(Oauth.builder()
                         .oauthProvider(OauthProvider.KAKAO)
                         .oauthId(oauthId)
+                        .fcmToken(fcmToken)
                         .build());
 
         Member member = oauth.getMember();

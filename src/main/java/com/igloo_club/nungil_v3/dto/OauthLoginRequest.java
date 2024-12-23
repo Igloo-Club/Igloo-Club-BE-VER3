@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OauthLoginRequest {
     private String code;
+    private String fcmToken;
 }
