@@ -314,6 +314,7 @@ public NungilResponse recommendMember(Member member){
      * 눈길을 최종 승락하는 api입니다
      * member의 ACCEPTED_SENT 눈길을 MATCHED 눈길로 수정하며
      * opponent의 ACCEPTED_RECEIVED 눈길을 MATCHED 눈길로 수정합니다
+     * 채팅방을 개설합니다
      *
      * @param nungilId 눈길 id
      */
@@ -348,6 +349,8 @@ public NungilResponse recommendMember(Member member){
         BlockedMember acquaintanceFromOpponent = getBlockedMember(opponent, member);
         acquaintanceFromOpponent.updateToMatched(NungilStatus.MATCHED);
         blockedMemberRepository.save(acquaintanceFromOpponent);
+
+        // 채팅방 개설 기능 추가
     }
 
     /**
@@ -365,6 +368,22 @@ public NungilResponse recommendMember(Member member){
         int myAnsweredQa = myQaList.size();
         NungilDetailResponse response = NungilDetailResponse.create(nungil, qaList,myAnsweredQa, getImageUrlList(nungil.getOpponent()));
         return response;
+    }
+
+    /**
+     * 눈길 수동 삭제 api입니다.
+     *
+     * @param nungilId 눈길 id
+     *
+     */
+    @Transactional
+    public void deleteRecommendedNungil(Member member, Long nungilId){
+        Nungil nungil = nungilRepository.findById(nungilId)
+                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        if(!nungil.getMember().equals(member)){
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_MEMBER);
+        }
+        nungilRepository.deleteById(nungilId);
     }
 
 
