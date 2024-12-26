@@ -16,7 +16,7 @@ public enum HobbyName {
     SWIMMING("수영", HobbyCategory.EXERCISE),
     HUMANITY("인문학", HobbyCategory.READING),
     PHILOSOPHY("철학", HobbyCategory.READING),
-    ECONIMIC("경제", HobbyCategory.READING),
+    ECONOMIC("경제", HobbyCategory.READING),
     HISTORY("역사", HobbyCategory.READING),
     IDOL("아이돌", HobbyCategory.MUSIC),
     INDIE("인디", HobbyCategory.MUSIC),

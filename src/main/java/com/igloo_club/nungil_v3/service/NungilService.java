@@ -2,33 +2,36 @@ package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
+import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
 import com.igloo_club.nungil_v3.dto.NungilResponse;
+import com.igloo_club.nungil_v3.dto.QuestionAndAnswerResponse;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.NungilErrorResult;
-import com.igloo_club.nungil_v3.mapper.NungilMapper;
 import com.igloo_club.nungil_v3.repository.BlockedMemberRepository;
 import com.igloo_club.nungil_v3.repository.MemberRepository;
 import com.igloo_club.nungil_v3.repository.NungilRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class NungilService {
-    private final MemberService memberService;
+    private final PresignedUrlService presignedUrlService;
+
+    private final QuestionAndAnswerService questionAndAnswerService;
 
     private final MemberRepository memberRepository;
+
     private final BlockedMemberRepository blockedMemberRepository;
+
     private final NungilRepository nungilRepository;
 
     private static final Long RECOMMENDATION_LIMIT = 1L;
@@ -40,7 +43,7 @@ public class NungilService {
      * @return nungilResponse 추천되는 사용자 눈길 정보
      */
     @Transactional
-    public NungilResponse recommendMember(Member member){
+public NungilResponse recommendMember(Member member){
 
         // 1. 하루 제한 횟수를 초과한 경우, 예외를 발생시킨다.
         if (checkLimitExcess(member)) {
@@ -69,9 +72,9 @@ public class NungilService {
         // 6. 추천이 정상적으로 동작했을 시 drawCount를 1 증가 시킨다.
         member.plusDrawCount();
 
-        // 7. 추천 받은 회원 정보를 반환한다. -> mapper 수정하기
-        return NungilMapper.INSTANCE.toResponse(newNungil);
-        // + 시간 초과 시 drawCount 초기화
+        // 7. 추천 받은 회원 정보를 반환한다.
+        List<String> imageUrlList = getImageUrlList(recommendedMember);
+        return NungilResponse.create(newNungil, imageUrlList);
     }
 
     private Member getRecommendedMember(Member currentMember) {
@@ -197,5 +200,213 @@ public class NungilService {
     private BlockedMember getBlockedMember(Member member, Member opponent) {
         return blockedMemberRepository.findByMemberAndOpponent(member, opponent)
                 .orElse(BlockedMember.create(member, opponent, NungilStatus.RECOMMENDED));
+    }
+
+
+    /**
+     * 요청 눈길 상태의 프로필을 전체 조회하는 메서드이다.
+     *
+     * @pararm pagealbe 페이지 정보
+     * @param status 요청 눈길 상태
+     *
+     * @return NungilPageResponse 슬라이스 정보 반환
+     */
+    public Slice<NungilResponse> getNungilSliceByMemberAndStatus(Member member, NungilStatus status, Pageable pageable){
+        int page = pageable.getPageNumber();
+        int size = pageable.getPageSize();
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        // Nungil 엔티티를 데이터베이스에서 조회
+        Slice<Nungil> nungilSlice = nungilRepository.findAllByMemberAndStatus(pageRequest, member, status);
+
+        // Nungil 엔티티를 NungilPageResponse DTO로 변환
+
+        List<NungilResponse> nungilResponses = nungilSlice.getContent().stream()
+                .map(nungil -> NungilResponse.create(nungil,getImageUrlList(nungil.getOpponent())))
+                .collect(Collectors.toList());
+
+        // 변환된 DTO 리스트와 함께 새로운 Slice 객체를 생성하여 반환
+        return new SliceImpl<>(nungilResponses, pageRequest, nungilSlice.hasNext());
+    }
+
+    /**
+     * 눈길을 보내는 api입니다
+     * member에게 recommend status의 눈길을 SENT로 수정하며
+     * opponent에게 status가 RECEIVED인 눈길을 생성합니다
+     *
+     * @param nungilId 눈길 id
+     */
+    @Transactional
+    public void sendNungil(Member member, Long nungilId) {
+        Nungil nungil = nungilRepository.findById(nungilId)
+                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        Member opponent = nungil.getOpponent();
+        // 눈길 상태가 RECOMMENDED가 아닌 경우 예외 처리
+        if (!nungil.getStatus().equals(NungilStatus.RECOMMENDED)) {
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
+        }
+
+        // BlockedMember에 각각 추가
+        BlockedMember memberAcquaintance = getBlockedMember(member, opponent);
+        BlockedMember opponentAcquaintance = getBlockedMember(opponent, member);
+
+
+        // 이미 눈길을 전송했을 시 예외 처리
+        List<Nungil> opponentNungilList = nungilRepository.findAllByMemberAndOpponentAndStatus(opponent, member, NungilStatus.RECEIVED);
+        if (opponentNungilList.size() > 0) {
+            throw new GeneralException(NungilErrorResult.NUNGIL_ALREADY_SENT);
+        }
+
+        // member의 눈길 상태를 SENT, 만료일을 3일 뒤로 설정
+        nungil.setStatus(NungilStatus.SENT);
+        nungil.setExpiredAtDaysAfter(3);
+        memberAcquaintance.update(NungilStatus.SENT, 7);
+
+        // opponent의 눈길 생성 및 저장, 만료일을 3일 뒤로 설정
+        Nungil newNungil = Nungil.create(opponent, member, NungilStatus.RECEIVED);
+        newNungil.setExpiredAtDaysAfter(3);
+        opponentAcquaintance.update(NungilStatus.RECEIVED, 7);
+        blockedMemberRepository.save(opponentAcquaintance);
+        nungilRepository.save(newNungil);
+    }
+
+    /**
+     * 눈길을 1차 승낙하는 api입니다
+     * member의 RECEIVED 눈길을 ACCEPTED_RECEIVED 눈길로 수정하며
+     * opponent의 SENT 눈길을 ACCEPTED_SENT 눈길로 수정합니다
+     *
+     * @param nungilId 눈길 id
+     */
+    @Transactional
+    public void acceptNungil(Member member, Long nungilId) {
+        Nungil memberNungil = nungilRepository.findById(nungilId)
+                .orElseThrow(()->new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        //눈길이 잘못된 상태일 시 에러 발생
+        if(!memberNungil.getStatus().equals(NungilStatus.RECEIVED)){
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
+        }
+
+        //사용자의 눈길을 ACCEPTED_RECEIVED 상태로 변경
+        memberNungil.setStatus(NungilStatus.ACCEPTED_RECEIVED);
+        memberNungil.setExpiredAtDaysAfter(3);
+
+        //상대방의 눈길을 ACCEPTED_SENT 상태로 변경
+        Member opponent = memberNungil.getOpponent();
+        Optional<Nungil> opponentNungilList = nungilRepository.findByMemberAndOpponentAndStatus(opponent, member, NungilStatus.SENT);
+        if(opponentNungilList.isEmpty()){
+            throw new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND);
+        }
+        Nungil opponentNungil = opponentNungilList.get();
+        opponentNungil.setStatus(NungilStatus.ACCEPTED_SENT);
+        opponentNungil.setExpiredAtDaysAfter(3);
+
+        // 서로에 대한 blockedMember 객체 만료 일자 3일 연장
+        BlockedMember acquaintanceFromMember = getBlockedMember(member, opponent);
+        acquaintanceFromMember.update(NungilStatus.ACCEPTED_RECEIVED, 7);
+        blockedMemberRepository.save(acquaintanceFromMember);
+
+        BlockedMember acquaintanceFromOpponent = getBlockedMember(opponent, member);
+        acquaintanceFromOpponent.update(NungilStatus.ACCEPTED_SENT, 7);
+        blockedMemberRepository.save(acquaintanceFromOpponent);
+    }
+
+    /**
+     * 눈길을 최종 승락하는 api입니다
+     * member의 ACCEPTED_SENT 눈길을 MATCHED 눈길로 수정하며
+     * opponent의 ACCEPTED_RECEIVED 눈길을 MATCHED 눈길로 수정합니다
+     * 채팅방을 개설합니다
+     *
+     * @param nungilId 눈길 id
+     */
+    @Transactional
+    public void matchNungil(Member member, Long nungilId) {
+        Nungil memberNungil = nungilRepository.findById(nungilId)
+                .orElseThrow(()->new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        //눈길이 잘못된 상태일 시 에러 발생
+        if(!memberNungil.getStatus().equals(NungilStatus.ACCEPTED_SENT)){
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
+        }
+
+        //사용자의 눈길을 MATCHED 상태로 변경
+        memberNungil.setStatus(NungilStatus.MATCHED);
+        memberNungil.setExpiredAtNull();
+
+        //상대방의 눈길을 MATCHED 상태로 변경
+        Member opponent = memberNungil.getOpponent();
+        Optional<Nungil> opponentNungilList = nungilRepository.findByMemberAndOpponentAndStatus(opponent, member, NungilStatus.ACCEPTED_RECEIVED);
+        if(opponentNungilList.isEmpty()){
+            throw new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND);
+        }
+        Nungil opponentNungil = opponentNungilList.get();
+        opponentNungil.setStatus(NungilStatus.MATCHED);
+        opponentNungil.setExpiredAtNull();
+
+        // 서로에 대한 blockedMember 객체 만료 일자 무기한 연장
+        BlockedMember acquaintanceFromMember = getBlockedMember(member, opponent);
+        acquaintanceFromMember.updateToMatched(NungilStatus.MATCHED);
+        blockedMemberRepository.save(acquaintanceFromMember);
+
+        BlockedMember acquaintanceFromOpponent = getBlockedMember(opponent, member);
+        acquaintanceFromOpponent.updateToMatched(NungilStatus.MATCHED);
+        blockedMemberRepository.save(acquaintanceFromOpponent);
+
+        // 채팅방 개설 기능 추가
+    }
+
+    /**
+     * 특정 눈길 정보를 조회하는 api입니다
+     *
+     * @param nungilId 눈길 id
+     * @return nungilDetailResponse 특정 눈길 상세 정보
+     */
+    public NungilDetailResponse getNungilDetail(Long nungilId){
+        Nungil nungil = nungilRepository.findById(nungilId)
+                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        PageRequest pageRequest = PageRequest.of(0, 3);
+        List<QuestionAndAnswerResponse> qaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getOpponent(), pageRequest).toList();
+        List<QuestionAndAnswerResponse> myQaList = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(nungil.getMember(), pageRequest).toList();
+        int myAnsweredQa = myQaList.size();
+        NungilDetailResponse response = NungilDetailResponse.create(nungil, qaList,myAnsweredQa, getImageUrlList(nungil.getOpponent()));
+        return response;
+    }
+
+    /**
+     * 추천된 눈길 수동 삭제 api입니다.
+     *
+     * @param nungilId 눈길 id
+     *
+     */
+    @Transactional
+    public void deleteRecommendedNungil(Member member, Long nungilId){
+        Nungil nungil = nungilRepository.findById(nungilId)
+                .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
+        if(!nungil.getMember().equals(member)){
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_MEMBER);
+        }
+        if(!nungil.getStatus().equals(NungilStatus.RECOMMENDED)){
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
+        }
+        nungilRepository.deleteById(nungilId);
+    }
+
+    /**
+     * 만료된 눈길 자동 삭제 api입니다.
+     */
+    @Transactional
+    @Scheduled(cron = "0 0 * * * *")
+    public void deleteExpiredNungil(){
+        LocalDateTime now = LocalDateTime.now();
+        List<Nungil> expiredNungilList = nungilRepository.findByExpiredAtBefore(now);
+
+        if (!expiredNungilList.isEmpty()) {
+            nungilRepository.deleteAll(expiredNungilList);
+        }
+    }
+    private List<String> getImageUrlList(Member member){
+        List<String> imageUrlList = member.getMemberImageList().stream()
+                .map(MemberImage::getFilename)
+                .map(filename -> presignedUrlService.generatePresignedDownloadUrl(filename.toString()))
+                .collect(Collectors.toList());
+        return imageUrlList;
     }
 }

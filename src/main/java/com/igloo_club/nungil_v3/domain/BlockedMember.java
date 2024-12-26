@@ -56,4 +56,15 @@ public class BlockedMember {
 
         return blockedMember;
     }
+    public void updateToMatched(NungilStatus status) {
+        this.status = status;
+        this.sentAt = LocalDateTime.now();
+        this.expiredAt = null;
+    }
+
+    public void update(NungilStatus status, int expireDuration) {
+        this.status = status;
+        this.sentAt = LocalDateTime.now();
+        this.expiredAt = this.sentAt.plusDays(expireDuration);
+    }
 }

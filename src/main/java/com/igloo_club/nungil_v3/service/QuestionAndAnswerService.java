@@ -132,30 +132,20 @@ public class QuestionAndAnswerService {
      * 특정 멤버의 전시 중인 질의응답들을 Slice로 조회하는 메소드입니다
      *
      * @param member 질의응답을 조회할 멤버
-     * @param page 가져올 페이지 번호
-     * @param size 페이지당 요소 수
+     * @param pageable 페이지 정보
      *
      * @return QuestionAndAnswerResponse의 페이지 객체
      */
-    public Slice<QuestionAndAnswerResponse> getExposingQuestionAndAnswerPageByMember(Member member, int page, int size) {
+    public Slice<QuestionAndAnswerResponse> getExposingQuestionAndAnswerPageByMember(Member member, Pageable pageable) {
 
-        // pageRequest를 exposureOrder 순으로 생성
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("exposureOrder").ascending());
+        Slice<Long> idsSlice = questionAndAnswerRepository.findIdsByMemberAndExposureOrderBetween(member, 0L, pageable.getPageSize() - 1, pageable);
+        List<QuestionAndAnswer> questionAndAnswers = questionAndAnswerRepository.findByIdsWithFetchJoin(idsSlice.getContent());
 
-        // 특정 멤버와 노출 순서 범위로 QuestionAndAnswer 엔티티를 데이터베이스에서 조회
-        Slice<QuestionAndAnswer> questionAndAnswerPage = questionAndAnswerRepository
-                .findAllByMemberAndExposureOrderBetween(member, 0L, (long)size -1);
-
-        // QuestionAndAnswer 엔티티를 QuestionAndAnswer DTO로 변환
-        List<QuestionAndAnswerResponse> questionAndAnswerResponse = questionAndAnswerPage.getContent().stream()
+        List<QuestionAndAnswerResponse> responseList = questionAndAnswers.stream()
                 .map(QuestionAndAnswerResponse::create)
                 .collect(Collectors.toList());
 
-        // 다음 페이지 존재 여부 확인
-        boolean hasNext = questionAndAnswerPage.hasNext();
-
-        // 변환된 DTO 리스트와 함께 새로운 Slice 객체를 생성하여 반환
-        return new SliceImpl<>(questionAndAnswerResponse, pageRequest, hasNext);
+        return new SliceImpl<>(responseList, pageable, idsSlice.hasNext());
     }
 
     /**
