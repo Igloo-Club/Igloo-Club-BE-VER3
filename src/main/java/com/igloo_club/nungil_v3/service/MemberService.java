@@ -16,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -50,6 +48,11 @@ public class MemberService {
 
         Profile profile = request.toProfile();
         member.createAdditionalProfile(profile);
+    }
+
+    @Transactional
+    public void updateAdditionalProfile(AdditionalProfileUpdateRequest request, Member member) {
+        member.updateAdditionalProfile(request);
     }
 
     @Transactional

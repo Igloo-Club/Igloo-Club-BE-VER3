@@ -1,7 +1,9 @@
 package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.*;
+import com.igloo_club.nungil_v3.dto.AdditionalProfileUpdateRequest;
 import lombok.*;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -75,5 +77,45 @@ public class Profile {
                 .build();
 
         this.hobbyList.add(hobby);
+    }
+
+    public void updateAdditonalProfile(AdditionalProfileUpdateRequest request) {
+
+        if (request.getHeight() != null && request.getHeight() >= 0) {
+            this.height = request.getHeight();
+        }
+
+        if (request.getReligion() != null) {
+            this.religion = request.getReligion();
+        }
+
+        if (request.getTattoo() != null) {
+            this.tattoo = request.getTattoo();
+        }
+
+        if (request.getSmoke() != null) {
+            this.smoke = request.getSmoke();
+        }
+
+        if (request.getMarriagePlan() != null) {
+            this.marriagePlan = request.getMarriagePlan();
+        }
+
+        if (request.getMbtiType() != null) {
+            this.mbtiType = request.getMbtiType();
+        }
+
+        if (request.getGrossSalary() != null) {
+            this.grossSalary = request.getGrossSalary();
+        }
+
+        if (StringUtils.hasText(request.getIntro())) {
+            this.intro = request.getIntro();
+        }
+
+        if (request.getHobbyList() != null) {
+            this.hobbyList.clear();
+            request.getHobbyList().forEach(hobbyRequest -> this.addHobby(hobbyRequest.getCategory(), hobbyRequest.getName()));
+        }
     }
 }
