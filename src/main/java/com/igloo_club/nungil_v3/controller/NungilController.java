@@ -71,7 +71,7 @@ public class NungilController {
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteNungil(Principal principal, @RequestParam Long nungilId){
         Member member = getMember(principal);
-        nungilService.matchNungil(member, nungilId);
+        nungilService.deleteNungil(member, nungilId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

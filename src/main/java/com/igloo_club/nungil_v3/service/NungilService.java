@@ -377,7 +377,7 @@ public NungilResponse recommendMember(Member member){
      *
      */
     @Transactional
-    public void deleteRecommendedNungil(Member member, Long nungilId){
+    public void deleteNungil(Member member, Long nungilId){
         Nungil nungil = nungilRepository.findById(nungilId)
                 .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
         if(!nungil.getMember().equals(member)){
