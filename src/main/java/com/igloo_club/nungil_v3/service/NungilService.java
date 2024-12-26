@@ -389,7 +389,19 @@ public NungilResponse recommendMember(Member member){
         nungilRepository.deleteById(nungilId);
     }
 
+    /**
+     * 만료된 눈길 자동 삭제 api입니다.
+     */
+    @Transactional
+    @Scheduled(cron = "0 0 * * * *")
+    public void deleteExpiredNungil(){
+        LocalDateTime now = LocalDateTime.now();
+        List<Nungil> expiredNungilList = nungilRepository.findByExpiredAtAfter(now);
 
+        if (!expiredNungilList.isEmpty()) {
+            nungilRepository.deleteAll(expiredNungilList);
+        }
+    }
     private List<String> getImageUrlList(Member member){
         List<String> imageUrlList = member.getMemberImageList().stream()
                 .map(MemberImage::getFilename)
