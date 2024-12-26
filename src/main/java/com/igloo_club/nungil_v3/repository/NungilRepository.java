@@ -16,5 +16,5 @@ public interface NungilRepository extends JpaRepository<Nungil, Long> {
     Slice<Nungil> findAllByMemberAndStatus(PageRequest request, Member member, NungilStatus status);
     List<Nungil> findAllByMemberAndOpponentAndStatus(Member member, Member receiver, NungilStatus status);
     Optional<Nungil> findByMemberAndOpponentAndStatus(Member member, Member receiver, NungilStatus status);
-    List<Nungil> findByExpiredAtAfter(LocalDateTime dateTime);
+    List<Nungil> findByExpiredAtBefore(LocalDateTime dateTime);
 }

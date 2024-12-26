@@ -396,7 +396,7 @@ public NungilResponse recommendMember(Member member){
     @Scheduled(cron = "0 0 * * * *")
     public void deleteExpiredNungil(){
         LocalDateTime now = LocalDateTime.now();
-        List<Nungil> expiredNungilList = nungilRepository.findByExpiredAtAfter(now);
+        List<Nungil> expiredNungilList = nungilRepository.findByExpiredAtBefore(now);
 
         if (!expiredNungilList.isEmpty()) {
             nungilRepository.deleteAll(expiredNungilList);
