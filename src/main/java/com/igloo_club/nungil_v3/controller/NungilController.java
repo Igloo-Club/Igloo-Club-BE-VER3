@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
+import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
 import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
 import com.igloo_club.nungil_v3.dto.NungilResponse;
 import com.igloo_club.nungil_v3.service.MemberService;
@@ -64,8 +65,7 @@ public class NungilController {
     @PatchMapping("/match")
     public ResponseEntity<?> matchNungil(Principal principal, @RequestParam Long nungilId){
         Member member = getMember(principal);
-        nungilService.matchNungil(member, nungilId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(nungilService.matchNungil(member, nungilId));
     }
 
     @DeleteMapping("/delete")

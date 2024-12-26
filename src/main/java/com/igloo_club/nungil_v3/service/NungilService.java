@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
+import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
 import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
 import com.igloo_club.nungil_v3.dto.NungilResponse;
 import com.igloo_club.nungil_v3.dto.QuestionAndAnswerResponse;
@@ -34,7 +35,10 @@ public class NungilService {
 
     private final NungilRepository nungilRepository;
 
+    private final ChatMessageService chatMessageService;
+
     private static final Long RECOMMENDATION_LIMIT = 1L;
+
     /* 눈길 관리 */
     /**
      * 사용자를 추천하는 api입니다.
@@ -319,7 +323,7 @@ public NungilResponse recommendMember(Member member){
      * @param nungilId 눈길 id
      */
     @Transactional
-    public void matchNungil(Member member, Long nungilId) {
+    public ChatRoomCreateResponse matchNungil(Member member, Long nungilId) {
         Nungil memberNungil = nungilRepository.findById(nungilId)
                 .orElseThrow(()->new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
         //눈길이 잘못된 상태일 시 에러 발생
@@ -351,6 +355,7 @@ public NungilResponse recommendMember(Member member){
         blockedMemberRepository.save(acquaintanceFromOpponent);
 
         // 채팅방 개설 기능 추가
+        return chatMessageService.createChatRoom(member, opponent);
     }
 
     /**
