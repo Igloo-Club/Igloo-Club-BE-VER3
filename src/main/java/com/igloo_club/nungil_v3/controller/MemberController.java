@@ -12,10 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -57,6 +54,21 @@ public class MemberController {
         memberService.createAdditionalProfile(request, member);
         // 2. 회사 규모 등록
         companyService.registerCompanyScale(request.getScale(), member.getCompany(), member);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("/api/member/additional")
+    @Operation(summary = "상세 프로필 수정", description = "사용자 상세 프로필 정보를 일부 수정하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "404_USER_NOT_FOUND", description = "사용자 조회 실패",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(example = "{\"code\": \"404_USER_NOT_FOUND\", \"message\": \"Failed to find the User\"}"))),
+    })
+    public ResponseEntity<?> updateAdditionalProfile(@RequestBody AdditionalProfileUpdateRequest request, Principal principal) {
+        Member member = getMember(principal);
+
+        memberService.updateAdditionalProfile(request, member);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

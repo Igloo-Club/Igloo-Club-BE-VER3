@@ -10,7 +10,9 @@ import com.igloo_club.nungil_v3.service.MemberService;
 import com.igloo_club.nungil_v3.service.QuestionAndAnswerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,13 +63,12 @@ public class QuestionAndAnswerController {
 
     @GetMapping("/exposing")
     public ResponseEntity<Slice<QuestionAndAnswerResponse>> getExposingQuestionAndAnswerPageByMember(
-            @RequestParam int page,
-            @RequestParam int size,
+            @PageableDefault(page = 0, size = 3) Pageable pageable,
             Principal principal) {
 
         Member member = getMember(principal);
 
-        Slice<QuestionAndAnswerResponse> response = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(member, page, size);
+        Slice<QuestionAndAnswerResponse> response = questionAndAnswerService.getExposingQuestionAndAnswerPageByMember(member, pageable);
         return ResponseEntity.ok(response);
     }
 

@@ -2,6 +2,7 @@ package com.igloo_club.nungil_v3.domain;
 
 import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.Sex;
+import com.igloo_club.nungil_v3.dto.AdditionalProfileUpdateRequest;
 import com.igloo_club.nungil_v3.dto.EssentialProfileCreateRequest;
 import com.igloo_club.nungil_v3.dto.IdealResponse;
 import com.igloo_club.nungil_v3.exception.GeneralException;
@@ -135,5 +136,9 @@ public class Member {
 
     public boolean isAuthor(ChatMessage chatMessage) {
         return this.id.equals(chatMessage.getMember().getId());
+    }
+      
+    public void updateAdditionalProfile(AdditionalProfileUpdateRequest request) {
+        this.profile.updateAdditonalProfile(request);
     }
 }

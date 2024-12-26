@@ -75,4 +75,5 @@ public class IdealCreateRequest {
                 .mapToObj(c -> (char) c)
                 .allMatch(c -> preferences.contains(MbtiElem.valueOf(String.valueOf(c))));
     }
+
 }
