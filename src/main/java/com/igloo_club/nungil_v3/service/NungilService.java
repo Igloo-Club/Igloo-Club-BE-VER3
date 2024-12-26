@@ -371,17 +371,20 @@ public NungilResponse recommendMember(Member member){
     }
 
     /**
-     * 눈길 수동 삭제 api입니다.
+     * 추천된 눈길 수동 삭제 api입니다.
      *
      * @param nungilId 눈길 id
      *
      */
     @Transactional
-    public void deleteNungil(Member member, Long nungilId){
+    public void deleteRecommendedNungil(Member member, Long nungilId){
         Nungil nungil = nungilRepository.findById(nungilId)
                 .orElseThrow(() -> new GeneralException(NungilErrorResult.NUNGIL_NOT_FOUND));
         if(!nungil.getMember().equals(member)){
             throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_MEMBER);
+        }
+        if(!nungil.getStatus().equals(NungilStatus.RECOMMENDED)){
+            throw new GeneralException(NungilErrorResult.NUNGIL_WRONG_STATUS);
         }
         nungilRepository.deleteById(nungilId);
     }
