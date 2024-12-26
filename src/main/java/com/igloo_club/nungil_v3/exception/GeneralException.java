@@ -12,7 +12,7 @@ public class GeneralException extends RuntimeException{
     }
 
     public GeneralException(ErrorResult errorResult, Throwable cause) {
-        super(errorResult.getMessage(), cause);
+        super(cause.getMessage(), cause);
         this.errorResult = errorResult;
     }
 }
