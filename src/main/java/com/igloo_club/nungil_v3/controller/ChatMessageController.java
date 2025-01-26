@@ -8,6 +8,8 @@ import com.igloo_club.nungil_v3.dto.ChatRoomDetailResponse;
 import com.igloo_club.nungil_v3.dto.ChatRoomListResponse;
 import com.igloo_club.nungil_v3.service.ChatMessageService;
 import com.igloo_club.nungil_v3.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -29,6 +31,7 @@ import static com.igloo_club.nungil_v3.util.TokenUtil.getAccessToken;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Chat", description = "Chat API")
 public class ChatMessageController {
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -51,6 +54,7 @@ public class ChatMessageController {
     }
 
     @GetMapping("/api/chatroom/{chatRoomId}")
+    @Operation(summary = "채팅방 상세 및 채팅내역 조회", description = "특정 채팅방의 상세정보 및 메시지 Slice를 가져오는 API입니다.")
     public ResponseEntity<ChatRoomDetailResponse> getMessageSlice(@PathVariable Long chatRoomId,
                                                                   @RequestParam(defaultValue = "0") int pageNumber,
                                                                   @RequestParam(defaultValue = "12") int pageSize,
@@ -66,6 +70,7 @@ public class ChatMessageController {
     }
 
     @GetMapping("/api/chatroom")
+    @Operation(summary = "채팅방 목록 조회", description = "채팅방 목록을 가져오는 api입니다.")
     public ResponseEntity<Slice<ChatRoomListResponse>> getRoomSlice(@RequestParam(defaultValue = "0") int pageNumber,
                                                                     @RequestParam(defaultValue = "12") int pageSize,
                                                                     Principal principal) {
@@ -79,6 +84,7 @@ public class ChatMessageController {
     }
 
     @DeleteMapping("/api/chat/{chatRoomId}/{chatMessageId}")
+    @Operation(summary = "채팅 메시지 삭제", description = "주어진 본인 채팅 메시지를 삭제하는 api입니다.")
     public ResponseEntity<ChatMessageResponse> deleteMessage(@PathVariable Long chatRoomId, @PathVariable Long chatMessageId, Principal principal) {
         Member member = getMember(principal);
 
@@ -88,6 +94,7 @@ public class ChatMessageController {
     }
 
     @DeleteMapping("/api/chatroom/{chatRoomId}")
+    @Operation(summary = "채팅방 나가기", description = "주어진 채팅방을 나가는 api입니다.")
     public ResponseEntity<?> deleteChatRoom(@PathVariable Long chatRoomId, Principal principal) {
         Member member = getMember(principal);
 
