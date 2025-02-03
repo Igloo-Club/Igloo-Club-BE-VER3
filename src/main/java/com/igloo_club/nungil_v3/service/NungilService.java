@@ -1,6 +1,7 @@
 package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
+import com.igloo_club.nungil_v3.domain.enums.MbtiType;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
 import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
 import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
@@ -55,9 +56,9 @@ public NungilResponse recommendMember(Member member){
         }
 
         // 2. 무료 뽑기 가능한 시간대가 아닌 경우, 예외를 발생시킨다.
-        if (checkTimeOut()) {
-            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
-        }
+//        if (checkTimeOut()) {
+//            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
+//        }
 
         // 3. 회원 한 명을 추천받는다.
         Member recommendedMember = getRecommendedMember(member);

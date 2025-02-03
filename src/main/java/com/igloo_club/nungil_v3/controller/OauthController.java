@@ -3,6 +3,7 @@ package com.igloo_club.nungil_v3.controller;
 import com.igloo_club.nungil_v3.domain.Member;
 import com.igloo_club.nungil_v3.dto.LoginResponse;
 import com.igloo_club.nungil_v3.dto.OauthLoginRequest;
+import com.igloo_club.nungil_v3.dto.RegisterProgressResponse;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.TokenErrorResult;
 import com.igloo_club.nungil_v3.service.MemberService;
@@ -59,6 +60,13 @@ public class OauthController {
         oauthService.kakaoLogout(member, request, response);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/api/progress")
+    public ResponseEntity<RegisterProgressResponse> getRegisterProgress(Principal principal){
+        Member member = getMember(principal);
+        RegisterProgressResponse registerProgressResponse = oauthService.getRegisterProgress(member);
+        return ResponseEntity.ok(registerProgressResponse);
     }
 
     private Member getMember(Principal principal) {
