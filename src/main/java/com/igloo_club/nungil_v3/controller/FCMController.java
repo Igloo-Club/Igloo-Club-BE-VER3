@@ -7,6 +7,7 @@ import com.igloo_club.nungil_v3.exception.FCMErrorResult;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.service.MemberService;
 import com.igloo_club.nungil_v3.service.FCMService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "FCM", description = "FCM API")
 public class FCMController {
 
     private final FCMService fcmService;
