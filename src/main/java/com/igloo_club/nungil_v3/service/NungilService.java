@@ -1,6 +1,7 @@
 package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
+import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.MbtiType;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
 import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
@@ -48,7 +49,7 @@ public class NungilService {
      * @return nungilResponse 추천되는 사용자 눈길 정보
      */
     @Transactional
-public NungilResponse recommendMember(Member member){
+    public NungilResponse recommendMember(Member member, Location location){
 
         // 1. 하루 제한 횟수를 초과한 경우, 예외를 발생시킨다.
         if (checkLimitExcess(member)) {
@@ -61,7 +62,7 @@ public NungilResponse recommendMember(Member member){
 //        }
 
         // 3. 회원 한 명을 추천받는다.
-        Member recommendedMember = getRecommendedMember(member);
+        Member recommendedMember = getRecommendedMember(member, location);
         if (recommendedMember == null) {
             throw new GeneralException(NungilErrorResult.NO_RECOMMENDATION);
         }
@@ -82,7 +83,7 @@ public NungilResponse recommendMember(Member member){
         return NungilResponse.create(newNungil, imageUrlList);
     }
 
-    private Member getRecommendedMember(Member currentMember) {
+    private Member getRecommendedMember(Member currentMember, Location selectedLocation) {
         List<Member> membersList = memberRepository.findBySex(currentMember.getOppositeSex());
         List<BlockedMember> blockedMembersList = blockedMemberRepository.findByMember(currentMember);
 
@@ -93,8 +94,10 @@ public NungilResponse recommendMember(Member member){
         // Block된 멤버와 위치를 기준으로 membersList 필터링
         membersList = membersList.stream()
                 .filter(member -> !blockedMemberIds.contains(member.getId())) // Block된 멤버 제외
+//                .filter(member -> member.getLocation().stream()
+//                        .anyMatch(location -> currentMember.getLocation().contains(location))) // 기존: location 비교
                 .filter(member -> member.getLocation().stream()
-                        .anyMatch(location -> currentMember.getLocation().contains(location))) // location 비교
+                        .anyMatch(location-> location.equals(selectedLocation))) // 변경 이후 선정된 location 비교
                 .collect(Collectors.toList());
 
         Ideal ideal = currentMember.getIdeal();
@@ -216,7 +219,7 @@ public NungilResponse recommendMember(Member member){
      *
      * @return NungilPageResponse 슬라이스 정보 반환
      */
-    public Slice<NungilResponse> getNungilSliceByMemberAndStatus(Member member, NungilStatus status, Pageable pageable){
+    public Slice<NungilResponse> getNungilSliceByMemberAndStatus(Member member, NungilStatus status, Location location, Pageable pageable){
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -224,9 +227,14 @@ public NungilResponse recommendMember(Member member){
         // Nungil 엔티티를 데이터베이스에서 조회
         Slice<Nungil> nungilSlice = nungilRepository.findAllByMemberAndStatus(pageRequest, member, status);
 
-        // Nungil 엔티티를 NungilPageResponse DTO로 변환
+        // 필터링된 결과를 새로운 Slice로 변환
+        List<Nungil> filteredList = nungilSlice.stream()
+                .filter(nungil -> nungil.getMember().getLocation().equals(location))
+                .collect(Collectors.toList());
 
-        List<NungilResponse> nungilResponses = nungilSlice.getContent().stream()
+
+        // Nungil 엔티티를 NungilPageResponse DTO로 변환
+        List<NungilResponse> nungilResponses = filteredList.stream()
                 .map(nungil -> NungilResponse.create(nungil,getImageUrlList(nungil.getOpponent())))
                 .collect(Collectors.toList());
 
