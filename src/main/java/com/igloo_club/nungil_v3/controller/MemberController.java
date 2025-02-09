@@ -158,6 +158,18 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "본인 근무지 조회", description = "API 요청자의 근무지를 조회하는 API", responses = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+    })
+    @GetMapping("/api/member/location")
+    public ResponseEntity<?> getMemberLocation(Principal principal) {
+        Member member = getMember(principal);
+
+        MemberLocationResponse response = memberService.getMemberLocationResponse(member);
+
+        return ResponseEntity.ok(response);
+    }
+
     private Member getMember(Principal principal) {
         return memberService.findById(Long.parseLong(principal.getName()));
     }

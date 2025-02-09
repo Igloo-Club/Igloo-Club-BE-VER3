@@ -84,6 +84,10 @@ public class MemberService {
         return MemberProfileResponse.create(member, profile, imageUrlList);
     }
 
+    public MemberLocationResponse getMemberLocationResponse(Member member) {
+        return MemberLocationResponse.create(member);
+    }
+
     @Transactional
     public MemberImageUploadUrlCreateResponse getImageUploadUrl(Member member) {
         Long count = memberImageRepository.countByMemberAndStatus(member, ImageStatus.UPLOAD_COMPLETE);
