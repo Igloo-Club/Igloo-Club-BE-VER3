@@ -110,6 +110,10 @@ public class NungilService {
 
         Ideal ideal = currentMember.getIdeal();
 
+        if (ideal == null) {
+            Random random = new Random();
+            return membersList.get(random.nextInt(membersList.size()));
+        }
 
         // 이상형과의 유사도 계산
         Stream<Member> stream = membersList.size() >= PARALLEL_THRESHOLD ? membersList.parallelStream() : membersList.stream();
@@ -135,6 +139,7 @@ public class NungilService {
         // 선택된 멤버 정보 가져오기
         return recommendingMembersList.get(random.nextInt(recommendingMembersList.size()));
     }
+
     /**
      * 사용자 이상형과 가장 부합하는 회원을 조회하는 메서드이다.
      * @param member 이상형과 비교할 회원
