@@ -2,7 +2,6 @@ package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
 import com.igloo_club.nungil_v3.domain.enums.Location;
-import com.igloo_club.nungil_v3.domain.enums.MbtiType;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
 import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
 import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -40,6 +40,9 @@ public class NungilService {
     private final ChatMessageService chatMessageService;
 
     private static final Long RECOMMENDATION_LIMIT = 1L;
+
+    private static final Long PARALLEL_THRESHOLD = 900L;
+
 
     /* 눈길 관리 */
     /**
@@ -100,51 +103,23 @@ public class NungilService {
                         .anyMatch(location-> location.equals(selectedLocation))) // 변경 이후 선정된 location 비교
                 .collect(Collectors.toList());
 
-        Ideal ideal = currentMember.getIdeal();
-        Map<Member, Integer> similarityMap = new HashMap<>(); // 각 멤버와 선호를 저장할 맵
-
-        for (Member member : membersList){
-            int similarityCount = 0;
-
-            // 나이 비교
-            int memberAge = member.calculateAge();
-            if (memberAge >= ideal.getPreferredAgeStart() && memberAge <= ideal.getPreferredAgeEnd()) {
-                similarityCount++;
-            }
-
-            // 키 비교
-            Profile profile = member.getProfile();
-            if (profile != null) {
-                int memberHeight = profile.getHeight();
-                if (memberHeight >= ideal.getPreferredHeightStart() && memberHeight <= ideal.getPreferredHeightEnd()) {
-                    similarityCount++;
-                }
-            }
-
-            // MBTI 비교
-            if (ideal.getMbtiList().contains(member.getProfile().getMbtiType())) {
-                similarityCount++;
-            }
-
-            // 흡연 여부 비교
-            if (ideal.getSmoke().equals(member.getProfile().getSmoke())) {
-                similarityCount++;
-            }
-
-            // 종교 비교
-            if (ideal.getReligion() == null || ideal.getReligion().equals(member.getProfile().getReligion())) {
-                similarityCount++;
-            }
-
-            // 결혼 계획 비교
-            if (ideal.getMarriagePlan() == null || ideal.getMarriagePlan().equals(member.getProfile().getMarriagePlan())) {
-                similarityCount++;
-            }
-
-            // 맵에 추가
-            similarityMap.put(member, similarityCount);
-
+        if (membersList.isEmpty()) {
+            return null;
         }
+
+
+        Ideal ideal = currentMember.getIdeal();
+
+
+        // 이상형과의 유사도 계산
+        Stream<Member> stream = membersList.size() >= PARALLEL_THRESHOLD ? membersList.parallelStream() : membersList.stream();
+
+        Map<Member, Integer> similarityMap = stream
+                .collect(Collectors.toMap(
+                        member -> member,  // Key: Member
+                        member -> calculateSimilarity(member, ideal) // calculateSimilarity 메서드 활용
+                ));
+
         List<Member> recommendingMembersList = similarityMap.entrySet().stream()
                 .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
                 .map(Map.Entry::getKey)
@@ -156,10 +131,54 @@ public class NungilService {
         }
         // 랜덤한 멤버 ID 선택
         Random random = new Random();
-        Member recommendedMember = recommendingMembersList.get(random.nextInt(recommendingMembersList.size()));
 
         // 선택된 멤버 정보 가져오기
-        return recommendedMember;
+        return recommendingMembersList.get(random.nextInt(recommendingMembersList.size()));
+    }
+    /**
+     * 사용자 이상형과 가장 부합하는 회원을 조회하는 메서드이다.
+     * @param member 이상형과 비교할 회원
+     * @param ideal 회원의 이상형
+     * @return similarityCount 회원의 이상형 유사도 점수
+     */
+    private int calculateSimilarity(Member member, Ideal ideal) {
+        int similarityCount = 0;
+        int memberAge = member.calculateAge();
+        Profile profile = member.getProfile();
+
+        // 나이 비교
+        if (memberAge >= ideal.getPreferredAgeStart() && memberAge <= ideal.getPreferredAgeEnd()) {
+            similarityCount++;
+        }
+
+        if (profile != null) {
+            // 키 비교
+            int memberHeight = profile.getHeight();
+            if (memberHeight >= ideal.getPreferredHeightStart() && memberHeight <= ideal.getPreferredHeightEnd()) {
+                similarityCount++;
+            }
+
+            // MBTI 비교
+            if (ideal.getMbtiList().contains(profile.getMbtiType())) {
+                similarityCount++;
+            }
+
+            // 흡연 여부 비교
+            if (ideal.getSmoke().equals(profile.getSmoke())) {
+                similarityCount++;
+            }
+
+            // 종교 비교
+            if (ideal.getReligion() == null || ideal.getReligion().equals(profile.getReligion())) {
+                similarityCount++;
+            }
+
+            // 결혼 계획 비교
+            if (ideal.getMarriagePlan() == null || ideal.getMarriagePlan().equals(profile.getMarriagePlan())) {
+                similarityCount++;
+            }
+        }
+        return similarityCount;
     }
 
     /**
@@ -229,7 +248,7 @@ public class NungilService {
 
         // 필터링된 결과를 새로운 Slice로 변환
         List<Nungil> filteredList = nungilSlice.stream()
-                .filter(nungil -> nungil.getMember().getLocation().equals(location))
+                .filter(nungil -> nungil.getMember().getLocation().get(0).equals(location))
                 .collect(Collectors.toList());
 
 
