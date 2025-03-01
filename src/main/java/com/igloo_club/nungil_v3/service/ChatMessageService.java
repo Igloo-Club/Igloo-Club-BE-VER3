@@ -1,6 +1,7 @@
 package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
+import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
 import com.igloo_club.nungil_v3.dto.*;
 import com.igloo_club.nungil_v3.exception.ChatMessageErrorResult;
 import com.igloo_club.nungil_v3.exception.ChatRoomErrorResult;
@@ -8,6 +9,7 @@ import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.repository.ChatMessageRepository;
 import com.igloo_club.nungil_v3.repository.ChatRoomRepository;
 import com.igloo_club.nungil_v3.repository.MemberChatRoomRepository;
+import com.igloo_club.nungil_v3.repository.NungilRepository;
 import com.igloo_club.nungil_v3.util.RedisKeyManager;
 import com.igloo_club.nungil_v3.util.SetRedisUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +37,8 @@ public class ChatMessageService {
     private final PresignedUrlService presignedUrlService;
 
     private final MemberChatRoomRepository memberChatRoomRepository;
+
+    private final NungilRepository nungilRepository;
 
     private final FcmEventService fcmEventService;
 
@@ -104,9 +109,15 @@ public class ChatMessageService {
         // 2. 채팅 상대방 탐색
         Member opponent = chatRoom.getOpponent(member.getId());
 
+        long nungilId = -1L;
+        Optional<Nungil> optionalNungil = nungilRepository.findByMemberAndOpponentAndStatus(member, opponent, NungilStatus.MATCHED);
+        if (optionalNungil.isPresent()) {
+            nungilId = optionalNungil.get().getId();
+        }
+
         // 3. 채팅방의 상세 정보 반환
         String imageUrl = presignedUrlService.generatePresignedDownloadUrl(opponent.getRepresentativeImageFilename());
-        return ChatRoomDetailResponse.create(opponent.getNickname(), imageUrl, chatRoomId, member.getId(), chatRoom.isInactiveChatRoom(), reversedMessageSlice);
+        return ChatRoomDetailResponse.create(opponent.getNickname(), imageUrl, chatRoomId, member.getId(), chatRoom.isInactiveChatRoom(), reversedMessageSlice, nungilId);
     }
 
     /**

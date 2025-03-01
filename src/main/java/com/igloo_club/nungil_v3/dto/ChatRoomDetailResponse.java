@@ -23,8 +23,9 @@ public class ChatRoomDetailResponse {
 
     private Slice<ChatMessageResponse> messageSlice;
 
+    private Long nungilId;
 
-    public static ChatRoomDetailResponse create(String nickname, String imageUrl, Long chatRoomId, Long ownMemberId, Boolean isInactive, Slice<ChatMessageResponse> messageSlice) {
+    public static ChatRoomDetailResponse create(String nickname, String imageUrl, Long chatRoomId, Long ownMemberId, Boolean isInactive, Slice<ChatMessageResponse> messageSlice, Long nungilId) {
         ChatRoomDetailResponse response = new ChatRoomDetailResponse();
 
         response.nickname = nickname;
@@ -33,6 +34,7 @@ public class ChatRoomDetailResponse {
         response.ownMemberId = ownMemberId;
         response.isInactive = isInactive;
         response.messageSlice = messageSlice;
+        response.nungilId = nungilId;
 
         return response;
     }
