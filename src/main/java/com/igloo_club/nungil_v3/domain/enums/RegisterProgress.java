@@ -11,6 +11,7 @@ public enum RegisterProgress {
     ESSENTIAL_PROFILE("필수 프로필 등록"),
     ADDITIONAL_PROFILE("상세 프로필 등록"),
     REGISTERED("가입완료"),
+    IDEAL_REGISTERED("이상형 등록")
     ;
 
     private final String title;

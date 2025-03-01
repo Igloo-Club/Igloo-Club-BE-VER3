@@ -10,6 +10,7 @@ import com.igloo_club.nungil_v3.domain.RefreshToken;
 import com.igloo_club.nungil_v3.domain.enums.OauthProvider;
 import com.igloo_club.nungil_v3.domain.enums.RegisterProgress;
 import com.igloo_club.nungil_v3.dto.LoginResponse;
+import com.igloo_club.nungil_v3.dto.RegisterProgressResponse;
 import com.igloo_club.nungil_v3.exception.GeneralException;
 import com.igloo_club.nungil_v3.exception.GlobalErrorResult;
 import com.igloo_club.nungil_v3.exception.TokenErrorResult;
@@ -96,12 +97,25 @@ public class OauthService {
         return new LoginResponse(accessToken, nextProgress, RegisterProgress.REGISTERED.equals(nextProgress));
     }
 
+    @Transactional
+    public RegisterProgressResponse getRegisterProgress(Member member){
+        RegisterProgress nextProgress = getNextProgress(member);
+
+        return new RegisterProgressResponse(nextProgress, RegisterProgress.REGISTERED.equals(nextProgress) || RegisterProgress.IDEAL_REGISTERED.equals(nextProgress));
+    }
+
+
+
     /**
      * 주어진 회원이 수행해야 하는 다음 가입 절차를 반환한다.
      * @param member 회원 엔티티
      * @return 다음에 수행할 가입 절차
      */
     public RegisterProgress getNextProgress(Member member) {
+        // 상세 프로필 존재하면, 가입 완료
+        if (member.getIdeal() != null) {
+            return RegisterProgress.IDEAL_REGISTERED;
+        }
 
         // 상세 프로필 존재하면, 가입 완료
         if (member.getProfile() != null) {

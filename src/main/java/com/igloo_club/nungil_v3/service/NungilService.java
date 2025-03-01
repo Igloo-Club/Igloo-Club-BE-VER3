@@ -1,6 +1,7 @@
 package com.igloo_club.nungil_v3.service;
 
 import com.igloo_club.nungil_v3.domain.*;
+import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
 import com.igloo_club.nungil_v3.dto.ChatRoomCreateResponse;
 import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -39,6 +41,9 @@ public class NungilService {
 
     private static final Long RECOMMENDATION_LIMIT = 1L;
 
+    private static final Long PARALLEL_THRESHOLD = 900L;
+
+
     /* 눈길 관리 */
     /**
      * 사용자를 추천하는 api입니다.
@@ -47,7 +52,7 @@ public class NungilService {
      * @return nungilResponse 추천되는 사용자 눈길 정보
      */
     @Transactional
-public NungilResponse recommendMember(Member member){
+    public NungilResponse recommendMember(Member member, Location location){
 
         // 1. 하루 제한 횟수를 초과한 경우, 예외를 발생시킨다.
         if (checkLimitExcess(member)) {
@@ -55,12 +60,12 @@ public NungilResponse recommendMember(Member member){
         }
 
         // 2. 무료 뽑기 가능한 시간대가 아닌 경우, 예외를 발생시킨다.
-        if (checkTimeOut()) {
-            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
-        }
+//        if (checkTimeOut()) {
+//            throw new GeneralException(NungilErrorResult.OUT_OF_TIME);
+//        }
 
         // 3. 회원 한 명을 추천받는다.
-        Member recommendedMember = getRecommendedMember(member);
+        Member recommendedMember = getRecommendedMember(member, location);
         if (recommendedMember == null) {
             throw new GeneralException(NungilErrorResult.NO_RECOMMENDATION);
         }
@@ -81,7 +86,7 @@ public NungilResponse recommendMember(Member member){
         return NungilResponse.create(newNungil, imageUrlList);
     }
 
-    private Member getRecommendedMember(Member currentMember) {
+    private Member getRecommendedMember(Member currentMember, Location selectedLocation) {
         List<Member> membersList = memberRepository.findBySex(currentMember.getOppositeSex());
         List<BlockedMember> blockedMembersList = blockedMemberRepository.findByMember(currentMember);
 
@@ -92,55 +97,33 @@ public NungilResponse recommendMember(Member member){
         // Block된 멤버와 위치를 기준으로 membersList 필터링
         membersList = membersList.stream()
                 .filter(member -> !blockedMemberIds.contains(member.getId())) // Block된 멤버 제외
+//                .filter(member -> member.getLocation().stream()
+//                        .anyMatch(location -> currentMember.getLocation().contains(location))) // 기존: location 비교
                 .filter(member -> member.getLocation().stream()
-                        .anyMatch(location -> currentMember.getLocation().contains(location))) // location 비교
+                        .anyMatch(location-> location.equals(selectedLocation))) // 변경 이후 선정된 location 비교
                 .collect(Collectors.toList());
 
-        Ideal ideal = currentMember.getIdeal();
-        Map<Member, Integer> similarityMap = new HashMap<>(); // 각 멤버와 선호를 저장할 맵
-
-        for (Member member : membersList){
-            int similarityCount = 0;
-
-            // 나이 비교
-            int memberAge = member.calculateAge();
-            if (memberAge >= ideal.getPreferredAgeStart() && memberAge <= ideal.getPreferredAgeEnd()) {
-                similarityCount++;
-            }
-
-            // 키 비교
-            Profile profile = member.getProfile();
-            if (profile != null) {
-                int memberHeight = profile.getHeight();
-                if (memberHeight >= ideal.getPreferredHeightStart() && memberHeight <= ideal.getPreferredHeightEnd()) {
-                    similarityCount++;
-                }
-            }
-
-            // MBTI 비교
-            if (ideal.getMbtiList().contains(member.getProfile().getMbtiType())) {
-                similarityCount++;
-            }
-
-            // 흡연 여부 비교
-            if (ideal.getSmoke().equals(member.getProfile().getSmoke())) {
-                similarityCount++;
-            }
-
-            // 종교 비교
-            if (ideal.getReligion() == null || ideal.getReligion().equals(member.getProfile().getReligion())) {
-                similarityCount++;
-            }
-
-            // 결혼 계획 비교
-            if (ideal.getMarriagePlan() == null || ideal.getMarriagePlan().equals(member.getProfile().getMarriagePlan())) {
-                similarityCount++;
-            }
-
-            // 맵에 추가
-            similarityMap.put(member, similarityCount);
-
+        if (membersList.isEmpty()) {
+            return null;
         }
+
+
+        Ideal ideal = currentMember.getIdeal();
+
+        if (ideal == null) {
+            Random random = new Random();
+            return membersList.get(random.nextInt(membersList.size()));
+        }
+
+        // 이상형과의 유사도 계산
+        Stream<Member> stream = membersList.size() >= PARALLEL_THRESHOLD ? membersList.parallelStream() : membersList.stream();
+
+        Map<Member, Integer> similarityMap = stream
+                .collect(Collectors.toMap(
+                        member -> member,  // Key: Member
+                        member -> calculateSimilarity(member, ideal) // calculateSimilarity 메서드 활용
+                ));
+
         List<Member> recommendingMembersList = similarityMap.entrySet().stream()
                 .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
                 .map(Map.Entry::getKey)
@@ -152,10 +135,55 @@ public NungilResponse recommendMember(Member member){
         }
         // 랜덤한 멤버 ID 선택
         Random random = new Random();
-        Member recommendedMember = recommendingMembersList.get(random.nextInt(recommendingMembersList.size()));
 
         // 선택된 멤버 정보 가져오기
-        return recommendedMember;
+        return recommendingMembersList.get(random.nextInt(recommendingMembersList.size()));
+    }
+
+    /**
+     * 사용자 이상형과 가장 부합하는 회원을 조회하는 메서드이다.
+     * @param member 이상형과 비교할 회원
+     * @param ideal 회원의 이상형
+     * @return similarityCount 회원의 이상형 유사도 점수
+     */
+    private int calculateSimilarity(Member member, Ideal ideal) {
+        int similarityCount = 0;
+        int memberAge = member.calculateAge();
+        Profile profile = member.getProfile();
+
+        // 나이 비교
+        if (memberAge >= ideal.getPreferredAgeStart() && memberAge <= ideal.getPreferredAgeEnd()) {
+            similarityCount++;
+        }
+
+        if (profile != null) {
+            // 키 비교
+            int memberHeight = profile.getHeight();
+            if (memberHeight >= ideal.getPreferredHeightStart() && memberHeight <= ideal.getPreferredHeightEnd()) {
+                similarityCount++;
+            }
+
+            // MBTI 비교
+            if (ideal.getMbtiList().contains(profile.getMbtiType())) {
+                similarityCount++;
+            }
+
+            // 흡연 여부 비교
+            if (ideal.getSmoke().equals(profile.getSmoke())) {
+                similarityCount++;
+            }
+
+            // 종교 비교
+            if (ideal.getReligion() == null || ideal.getReligion().equals(profile.getReligion())) {
+                similarityCount++;
+            }
+
+            // 결혼 계획 비교
+            if (ideal.getMarriagePlan() == null || ideal.getMarriagePlan().equals(profile.getMarriagePlan())) {
+                similarityCount++;
+            }
+        }
+        return similarityCount;
     }
 
     /**
@@ -215,7 +243,7 @@ public NungilResponse recommendMember(Member member){
      *
      * @return NungilPageResponse 슬라이스 정보 반환
      */
-    public Slice<NungilResponse> getNungilSliceByMemberAndStatus(Member member, NungilStatus status, Pageable pageable){
+    public Slice<NungilResponse> getNungilSliceByMemberAndStatus(Member member, NungilStatus status, Location location, Pageable pageable){
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -223,9 +251,14 @@ public NungilResponse recommendMember(Member member){
         // Nungil 엔티티를 데이터베이스에서 조회
         Slice<Nungil> nungilSlice = nungilRepository.findAllByMemberAndStatus(pageRequest, member, status);
 
-        // Nungil 엔티티를 NungilPageResponse DTO로 변환
+        // 필터링된 결과를 새로운 Slice로 변환
+        List<Nungil> filteredList = nungilSlice.stream()
+                .filter(nungil -> nungil.getMember().getLocation().get(0).equals(location))
+                .collect(Collectors.toList());
 
-        List<NungilResponse> nungilResponses = nungilSlice.getContent().stream()
+
+        // Nungil 엔티티를 NungilPageResponse DTO로 변환
+        List<NungilResponse> nungilResponses = filteredList.stream()
                 .map(nungil -> NungilResponse.create(nungil,getImageUrlList(nungil.getOpponent())))
                 .collect(Collectors.toList());
 

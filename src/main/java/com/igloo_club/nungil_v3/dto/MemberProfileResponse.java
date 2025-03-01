@@ -19,6 +19,8 @@ public class MemberProfileResponse {
 
     private String nickname;
 
+    private String email;
+
     private Sex sex;
 
     @JsonFormat(pattern = "yyyyMMdd")
@@ -62,6 +64,7 @@ public class MemberProfileResponse {
         MemberProfileResponse response = new MemberProfileResponse();
 
         response.nickname = member.getNickname();
+        response.email = member.getEmail();
         response.sex = member.getSex();
         response.birthdate = member.getBirthdate();
         response.job = member.getJob();

@@ -1,6 +1,7 @@
 package com.igloo_club.nungil_v3.controller;
 
 import com.igloo_club.nungil_v3.domain.Member;
+import com.igloo_club.nungil_v3.domain.enums.Location;
 import com.igloo_club.nungil_v3.domain.enums.NungilStatus;
 import com.igloo_club.nungil_v3.dto.NungilDetailResponse;
 import com.igloo_club.nungil_v3.dto.NungilResponse;
@@ -28,19 +29,19 @@ public class NungilController {
 
     @PostMapping("/recommend")
     @Operation(summary = "눈길 뽑기", description = "프로필 뽑을 때 사용하는 api이다")
-    public ResponseEntity<NungilResponse> recommendMember(Principal principal){
+    public ResponseEntity<NungilResponse> recommendMember(@RequestParam Location location, Principal principal){
         Member member = getMember(principal);
-        NungilResponse nungilResponse = nungilService.recommendMember(member);
+        NungilResponse nungilResponse = nungilService.recommendMember(member, location);
         return ResponseEntity.ok(nungilResponse);
     }
 
     @GetMapping("/list")
     @Operation(summary = "눈길 리스트 조회", description = "눈길 리스트를 확인할 수 있는 API입니다.")
-    public ResponseEntity<Slice<NungilResponse>> getNungilsByMemberAndStatus(Principal principal, @RequestParam NungilStatus status, @PageableDefault(page = 0, size = 4) Pageable pageable){
+    public ResponseEntity<Slice<NungilResponse>> getNungilsByMemberAndStatusAndLocation(Principal principal, @RequestParam NungilStatus status, @RequestParam Location location, @PageableDefault(page = 0, size = 4) Pageable pageable){
         Member member = getMember(principal);
 
         Slice<NungilResponse> nungilPageResponses = null;
-        nungilPageResponses = nungilService.getNungilSliceByMemberAndStatus(member, status, pageable);
+        nungilPageResponses = nungilService.getNungilSliceByMemberAndStatus(member, status, location, pageable);
 
         return ResponseEntity.ok(nungilPageResponses);
     }
