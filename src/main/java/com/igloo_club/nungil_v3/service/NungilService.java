@@ -133,11 +133,9 @@ public class NungilService {
             // 추천할 멤버가 없을 시 null 반환
             return null;
         }
-        // 랜덤한 멤버 ID 선택
-        Random random = new Random();
 
         // 선택된 멤버 정보 가져오기
-        return recommendingMembersList.get(random.nextInt(recommendingMembersList.size()));
+        return recommendingMembersList.get(0);
     }
 
     /**
